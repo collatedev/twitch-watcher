@@ -1,0 +1,23 @@
+{
+  "name": "twitchwatcher",
+  "version": "1.0.0",
+  "description": "A service that watches twitch webhooks of influencers on Collate",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/collatedev/twitch-watcher.git"
+  },
+  "author": "Evan Coulson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/collatedev/twitch-watcher/issues"
+  },
+  "homepage": "https://github.com/collatedev/twitch-watcher#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4"
+  }
+}
