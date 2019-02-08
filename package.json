@@ -4,10 +4,12 @@
   "description": "A service that watches twitch webhooks of influencers on Collate",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js 8080",
+    "start": "nodemon dist/Server.js 8080",
+    "build": "tsc ./src/Server.ts --outDir ./dist",
     "docker-build": "docker build -t collate/twitch-watcher .",
-    "docker-run": "npm run docker-build && docker run -p 8000:8080 -v ${pwd}:/app collate/twitch-watcher",
-    "webhook-env:start": "ngrok http 8080"
+    "docker-run": "npm run docker-build && docker run -d -p 8000:8080 -v ${pwd}:/app collate/twitch-watcher",
+    "webhook-local": "ngrok http 8080",
+    "webhook-docker": "ngrok http 8000"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,9 @@
   },
   "homepage": "https://github.com/collatedev/twitch-watcher#readme",
   "dependencies": {
+    "@types/express": "^4.16.1",
+    "@types/node": "^10.12.23",
+    "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "nodemon": "^1.18.9"

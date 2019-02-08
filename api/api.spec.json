@@ -1,0 +1,502 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "0.0.1",
+      "title": "Twitch Watcher API",
+      "description": "The API that will describe the twitch watching service",
+      "contact": {
+        "name": "Evan Coulson"
+      }
+    },
+    "tags": [
+      {
+        "name": "Hooks",
+        "description": "Collate Twitch webhook information"
+      },
+      {
+        "name": "Topics",
+        "description": "The various topics that twitch exposes"
+      }
+    ],
+    "definitions": {
+      "TwitchUserWebhookInfo": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "streamHook": {
+            "$ref": "#/definitions/WebhookInfo"
+          },
+          "userHook": {
+            "$ref": "#/definitions/WebhookInfo"
+          },
+          "followerHook": {
+            "$ref": "#/definitions/WebhookInfo"
+          }
+        }
+      },
+      "WebhookInfo": {
+        "properties": {
+          "callbackURL": {
+            "type": "string"
+          },
+          "topicURL": {
+            "type": "string"
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Message": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SubscribeBody": {
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "callback": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "integer"
+          }
+        }
+      },
+      "UnsubscribeBody": {
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "integer"
+          }
+        }
+      },
+      "TwitchRequest": {
+        "properties": {
+          "hub.mode": {
+            "type": "string"
+          },
+          "hub.topic": {
+            "type": "string"
+          },
+          "hub.lease_seconds": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hub.challenge": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "paths": {
+      "/hooks/{userID}": {
+        "get": {
+          "description": "The end point that gets the hook information that is related to the Twitch User ID that is pass through the path parameter.",
+          "summary": "Gets the Twitch webhook information of a specific user",
+          "operationId": "getTwitchWebhooks",
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "Hooks"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userID",
+              "type": "integer",
+              "required": true,
+              "description": "Numeric ID of the user to get."
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A list of twitch webhook infos",
+              "schema": {
+                "$ref": "#/definitions/TwitchUserWebhookInfo"
+              }
+            },
+            "404": {
+              "description": "Twitch user was not found in our service",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "A server internal failure",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      },
+      "/subscribe": {
+        "post": {
+          "tags": [
+            "Hooks"
+          ],
+          "description": "The endpoint that handles subscriptions to a Twitch webhook topic.",
+          "summary": "Initiates a Twitch web hook subscription to a given topic",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "The body of the subscription request",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/SubscribeBody"
+              }
+            }
+          ],
+          "operationId": "subscribeToHook",
+          "responses": {
+            "200": {
+              "description": "Response from a successful subscripition",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "Response from a failed subscripition",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      },
+      "/unsubscribe": {
+        "post": {
+          "description": "The endpoint that handles unsubscription from a Twitch webhook topic.",
+          "tags": [
+            "Hooks"
+          ],
+          "summary": "Initiates a Twitch web hook subscription to a given topic",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "The body of the subscription request",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/UnsubscribeBody"
+              }
+            }
+          ],
+          "operationId": "unsubscribeFromHook",
+          "responses": {
+            "200": {
+              "description": "Response from a successful unsubscripition",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "Response from a failed unsubscripition",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      },
+      "/streams": {
+        "get": {
+          "description": "The endpoint that confirms the subscription to a stream topic and updates the user information regarding the stream webhook.",
+          "summary": "The challenge endpoint for a stream topic subscription",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "text/html"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "streamTopicChallenger",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "hub.topic",
+              "type": "string",
+              "required": true,
+              "description": "The topic url being subscribed to"
+            },
+            {
+              "in": "query",
+              "name": "hub.mode",
+              "type": "string",
+              "required": true,
+              "description": "The mode of the Twitch subscription validation response"
+            },
+            {
+              "in": "query",
+              "name": "hub.reason",
+              "type": "string",
+              "required": false,
+              "description": "The reason the subscription to the webhook was rejected"
+            },
+            {
+              "in": "query",
+              "name": "hub.challenge",
+              "type": "string",
+              "required": false,
+              "description": "The challenge token to confirm the subscription to the Twitch webhook"
+            },
+            {
+              "in": "query",
+              "name": "hub.lease_seconds",
+              "type": "integer",
+              "required": false,
+              "description": "The amount of time tha the subscription to the webhook will remain valid"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Responds with a Twitch challenge token",
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "post": {
+          "description": "The endpoint that handles the twitch stream events.",
+          "summary": "The endpoint that handles stream webhook requests",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "streamTopicHandler",
+          "responses": {
+            "200": {
+              "description": "Responds with a success message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "Responds with a failure message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      },
+      "/user": {
+        "get": {
+          "description": "The endpoint that confirms the subscription to a user topic and updates the user information regarding the user webhook.",
+          "summary": "The challenge endpoint for a user topic subscription",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "text/html"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "userTopicChallenger",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "hub.topic",
+              "type": "string",
+              "required": true,
+              "description": "The topic url being subscribed to"
+            },
+            {
+              "in": "query",
+              "name": "hub.mode",
+              "type": "string",
+              "required": true,
+              "description": "The mode of the Twitch subscription validation response"
+            },
+            {
+              "in": "query",
+              "name": "hub.reason",
+              "type": "string",
+              "required": false,
+              "description": "The reason the subscription to the webhook was rejected"
+            },
+            {
+              "in": "query",
+              "name": "hub.challenge",
+              "type": "string",
+              "required": false,
+              "description": "The challenge token to confirm the subscription to the Twitch webhook"
+            },
+            {
+              "in": "query",
+              "name": "hub.lease_seconds",
+              "type": "integer",
+              "required": false,
+              "description": "The amount of time tha the subscription to the webhook will remain valid"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Responds with a Twitch challenge token",
+              "schema": {
+                "type": "string"
+              }
+            },
+            "500": {
+              "description": "Responds with a failure message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        },
+        "post": {
+          "description": "The endpoint that handles the twitch user update events.",
+          "summary": "The endpoint that handles user webhook requests",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "userTopicHandler",
+          "responses": {
+            "200": {
+              "description": "Responds with a success message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "Responds with a failure message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      },
+      "/follow": {
+        "get": {
+          "description": "The endpoint that confirms the subscription to a follow topic and updates the user information regarding the follow webhook.",
+          "summary": "The challenge endpoint for a follow topic subscription",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "text/html"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "followTopicChallenger",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "hub.topic",
+              "type": "string",
+              "required": true,
+              "description": "The topic url being subscribed to"
+            },
+            {
+              "in": "query",
+              "name": "hub.mode",
+              "type": "string",
+              "required": true,
+              "description": "The mode of the Twitch subscription validation response"
+            },
+            {
+              "in": "query",
+              "name": "hub.reason",
+              "type": "string",
+              "required": false,
+              "description": "The reason the subscription to the webhook was rejected"
+            },
+            {
+              "in": "query",
+              "name": "hub.challenge",
+              "type": "string",
+              "required": false,
+              "description": "The challenge token to confirm the subscription to the Twitch webhook"
+            },
+            {
+              "in": "query",
+              "name": "hub.lease_seconds",
+              "type": "integer",
+              "required": false,
+              "description": "The amount of time tha the subscription to the webhook will remain valid"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Responds with a Twitch challenge token",
+              "schema": {
+                "type": "string"
+              }
+            },
+            "500": {
+              "description": "Responds with a failure message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        },
+        "post": {
+          "description": "The endpoint that handles the twitch follow events.",
+          "summary": "The endpoint that handles follow webhook requests",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "Topics"
+          ],
+          "operationId": "followTopicHandler",
+          "responses": {
+            "200": {
+              "description": "Responds with a success message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "500": {
+              "description": "Responds with a failure message",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
