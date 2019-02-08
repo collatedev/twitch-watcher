@@ -2,7 +2,7 @@
   "name": "twitchwatcher",
   "version": "1.0.0",
   "description": "A service that watches twitch webhooks of influencers on Collate",
-  "main": "app.js",
+  "main": "./dist/server.js",
   "scripts": {
     "start": "nodemon dist/Server.js 8080",
     "build": "tsc ./src/Server.ts --outDir ./dist",

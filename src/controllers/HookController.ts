@@ -1,7 +1,13 @@
-import TwitchUser from "../models/TwitchUser"
+import TwitchUserModel from "../models/TwitchUserModel";
 
 export default class HookController {
-    public getUser() {
-        return new TwitchUser(1);
+    private twitchUserModel: TwitchUserModel;
+
+    constructor() {
+        this.twitchUserModel = new TwitchUserModel();
+    }
+
+    public getUserInfo(id: number) {
+        return this.twitchUserModel.getByID(id);
     }
 }

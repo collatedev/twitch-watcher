@@ -1,5 +1,4 @@
 import App from "./App"
-import IRouter from "./routes/IRouter";
 import HookRouter from "./routes/HookRouter";
 
 let app : App = new App();
