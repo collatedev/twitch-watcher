@@ -1,4 +1,5 @@
 import TwitchUserModel from "../models/TwitchUserModel";
+import DataMessage from "../schemas/DataMessage";
 
 export default class HookController {
     private twitchUserModel: TwitchUserModel;
@@ -7,7 +8,7 @@ export default class HookController {
         this.twitchUserModel = new TwitchUserModel();
     }
 
-    public getUserInfo(id: number) {
-        return this.twitchUserModel.getByID(id);
+    public async getUserInfo(id: number) {
+        return new DataMessage(await this.twitchUserModel.getByID(id));
     }
 }
