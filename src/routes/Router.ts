@@ -1,25 +1,26 @@
 import * as Express from "express"
 import IRouter from "./IRouter";
 import * as Path from "path";
+import IController from "../controllers/IController";
 
 const ExpressRouter: Express.Router = Express.Router();
 const RootPath = '/api/v1/';
 
 export default abstract class Router implements IRouter {
-    protected router = ExpressRouter;
+    protected router : Express.Router = ExpressRouter;
     private basePath : string;
 
-    constructor(path) {
+    constructor(path: string) {
         this.basePath = path;
     }
 
-    public getPath() {
+    public getPath(): string {
         return Path.join(RootPath, this.basePath)
     }
 
-    public getRouter() {
+    public getRouter(): Express.Router {
         return ExpressRouter;
     }
     
-    public abstract setup();
+    public abstract setup(): void;
 }
