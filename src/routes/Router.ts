@@ -1,7 +1,6 @@
 import * as Express from "express"
 import IRouter from "./IRouter";
 import * as Path from "path";
-import IController from "../controllers/IController";
 
 const ExpressRouter: Express.Router = Express.Router();
 const RootPath = '/api/v1/';

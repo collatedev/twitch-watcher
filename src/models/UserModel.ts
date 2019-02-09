@@ -1,6 +1,6 @@
 import TwitchUser from "../schemas/TwitchUser";
 
-export default class TwitchUserModel {
+export default class UserModel {
     constructor() {
 
     }

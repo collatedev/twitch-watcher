@@ -1,10 +1,10 @@
 import TwitchWebhook from "./TwitchWebhook"
 
 export default class TwitchUser {
-    id: number;
-    streamHook: TwitchWebhook;
-    userHook: TwitchWebhook;
-    followerHook: TwitchWebhook;
+    public id: number;
+    public streamHook: TwitchWebhook;
+    public userHook: TwitchWebhook;
+    public followerHook: TwitchWebhook;
 
     constructor(id: number) {
         this.id = id;
