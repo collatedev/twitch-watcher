@@ -9,7 +9,8 @@
         "noImplicitAny": true,
         "strictFunctionTypes": true,
         "noImplicitThis": true,
-        "alwaysStrict": true
+        "alwaysStrict": true,
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "src/**/*"

@@ -17,15 +17,18 @@ export default class HookRouter extends Router {
 	}
 
 	public async getUserRoute(req: Express.Request, res: Express.Response) {
-		let userID = parseInt(req.params.userID, 10);
+		let userID = parseFloat(req.params.userID);
 		if (!this.isValidID(userID)) {
-			res.status(400).send(
+			console.log(new ErrorMessage(
+				`The Twitch User ID must be an integer value, instead received '${userID}'`
+			));
+			res.json(
 				new ErrorMessage(
-					`The Twitch User ID must be an integer value, instead received ${userID}`
+					`The Twitch User ID must be an integer value, instead received '${userID}'`
 				)
-			);
+			).status(400);
 		} else {
-			res.send(await this.hookController.getUserInfo(userID)).status(200);
+			res.json(await this.hookController.getUserInfo(userID)).status(200);
 		}
 	}
 	
