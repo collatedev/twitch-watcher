@@ -4,7 +4,7 @@
   "description": "A service that watches twitch webhooks of influencers on Collate",
   "main": "./dist/server.js",
   "scripts": {
-    "start": "nodemon dist/Server.js 8080",
+    "start": "npm run build && node dist/Server.js 8080",
     "build": "tsc ./src/Server.ts --outDir ./dist",
     "test": "npm run build && mocha -r ts-node/register tests/**/*.spec.ts",
     "docker-build": "docker build -t collate/twitch-watcher .",

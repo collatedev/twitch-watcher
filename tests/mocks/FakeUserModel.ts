@@ -1,7 +1,7 @@
 import UserModel from "../../src/models/UserModel";
 import TwitchUser from "../../src/schemas/TwitchUser";
 
-export default class FakeTwitchUserModel extends UserModel {
+export default class FakeUserModel extends UserModel {
     private db : { [key: number]: TwitchUser; }
 
     constructor() {

@@ -1,9 +1,6 @@
 import Router from "./Router";
 import * as Express from "express";
 import UserLayer from "../layers/UserLayer";
-import ErrorMessage from "../schemas/ErrorMessage";
-import UserModel from "../models/UserModel";
-import DataMessage from "../schemas/DataMessage";
 
 export default class UserRouter extends Router {
 	private userLayer : UserLayer;
@@ -20,12 +17,10 @@ export default class UserRouter extends Router {
 
 	public async getUserByID(request: Express.Request, response: Express.Response) {
 		let userID = parseFloat(request.params.userID);
-		if (!this.isValidID(userID)) {
-			response
-				.json(new ErrorMessage(`The Twitch User ID must be a positive integer value, instead received '${userID}'`))
-				.status(400);
-		} else {
+		if (this.isValidID(userID)) {
 			await this.sendUserData(response, userID);
+		} else {
+			this.sendError(response, `The Twitch User ID must be a positive integer value, instead received '${userID}'`, 400);
 		}
 		
 	}
@@ -33,13 +28,9 @@ export default class UserRouter extends Router {
 	private async sendUserData(response: Express.Response, userID: number) {
 		try {
 			let user = await this.userLayer.getUserInfo(userID);
-			response
-				.json(new DataMessage(user))
-				.status(200);
+			this.sendData(response, user, 200);
 		} catch (error) {
-			response
-				.json(new ErrorMessage(`Failed to get user with id: ${userID}`))
-				.status(404);
+			this.sendError(response, `Failed to get user with id: ${userID}`, 404);
 		}
 	}
 	

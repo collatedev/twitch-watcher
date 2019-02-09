@@ -4,16 +4,14 @@ import 'mocha';
 import FakeUserModel from "../mocks/FakeUserModel";
 import { mockReq, mockRes } from 'sinon-express-mock'
 import * as sinonChai from 'sinon-chai'
-import { Response } from "express"
-import ErrorMessage from "../../src/schemas/ErrorMessage";
-import TwitchUser from "../../src/schemas/TwitchUser";
-import DataMessage from "../../src/schemas/DataMessage";
+import ErrorMessage from "../../src/messages/ErrorMessage";
+import DataMessage from "../../src/messages/DataMessage";
 import UserLayer from "../../src/layers/UserLayer";
 
 use(sinonChai);
 
-describe('Hook Router', () => {
-    describe('getUserRoute', () => {
+describe('User Router', () => {
+    describe('getUserByID', () => {
         it('Should fail due to a string userID', async () => {
             let router = new UserRouter(new UserLayer(new FakeUserModel()));
             let request = mockReq({

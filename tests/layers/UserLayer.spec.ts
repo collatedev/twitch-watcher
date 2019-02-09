@@ -4,7 +4,7 @@ import FakeUserModel from '../../src/models/UserModel'
 import 'mocha';
 import TwitchUser from '../../src/schemas/TwitchUser';
 
-describe('Hook Router', () => {
+describe('User Layer', () => {
     describe('getUserInfo', () => {
         it('Should get a user with id 1', async () => {
             let controller = new UserLayer(new FakeUserModel());

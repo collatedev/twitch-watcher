@@ -8,8 +8,8 @@ export default class TwitchUser {
 
     constructor(id: number) {
         this.id = id;
-        this.streamHook = new TwitchWebhook("callbackURL", "topicURL", new Date());
-        this.userHook = new TwitchWebhook("callbackURL", "topicURL", new Date());
-        this.followerHook = new TwitchWebhook("callbackURL", "topicURL", new Date());
+        this.streamHook = null
+        this.userHook = null
+        this.followerHook = null
     }
 }

@@ -1,4 +1,4 @@
-import Message from "../schemas/Message"
+import Message from "./Message"
 
 export default class DataMessage extends Message {
 	private data: Object;
