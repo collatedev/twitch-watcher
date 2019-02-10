@@ -5,8 +5,8 @@
   "main": "./dist/server.js",
   "scripts": {
     "start": "npm run build && node dist/Server.js 8080",
-    "build": "tsc ./src/Server.ts --outDir ./dist",
-    "test": "npm run build && NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts",
+    "build": "rm -rf ./dist && tsc ./src/Server.ts --outDir ./dist",
+    "test": "npm run build && NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
     "docker-build": "docker build -t collate/twitch-watcher .",
     "docker-run": "npm run docker-build && docker run -d -p 8000:8080 -v ${pwd}:/app collate/twitch-watcher",
     "webhook-local": "ngrok http 8080",

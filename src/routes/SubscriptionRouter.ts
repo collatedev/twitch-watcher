@@ -1,17 +1,27 @@
 import Router from "./Router";
-import * as Express from "express";
+import { Request, Response } from "express";
 import UserLayer from "../layers/UserLayer";
 import SubscriptionBody from "../bodys/SubscriptionBody";
 import BodyValidator from "../validators/BodyValidator";
 import { Logger } from "../config/Winston";
 import UnsubscriptionBody from "../bodys/UnsubscriptionBody";
+import StatusCodes from "./StatusCodes";
+
 
 export default class SubscriptionRouter extends Router {
+    readonly unsubscribeFields = ["topic", "userID"];
+    readonly subscribeFields = ["callbackURL", "topic", "userID"];
+
     private userLayer : UserLayer;
+    private unsubscribeBodyValidator: BodyValidator<UnsubscriptionBody>;
+    private subscribeBodyValidator: BodyValidator<SubscriptionBody>;
 
     constructor(userLayer: UserLayer) {
         super('/user/subscriptions');
         this.userLayer = userLayer;
+        this.unsubscribeBodyValidator = new BodyValidator<UnsubscriptionBody>(this.unsubscribeFields);
+        this.subscribeBodyValidator = new BodyValidator<SubscriptionBody>(this.subscribeFields);
+
         this.handleSubscription = this.handleSubscription.bind(this);
         this.handleUnsubscription = this.handleUnsubscription.bind(this);
     }
@@ -21,37 +31,35 @@ export default class SubscriptionRouter extends Router {
         this.router.post('/unsubscribe', this.handleUnsubscription);
     }
 
-    public async handleSubscription(request: Express.Request, response: Express.Response) {
-        let requiredFields = ["callbackURL", "topic", "userID"]
-        let validator = new BodyValidator(requiredFields);
+    public async handleSubscription(request: Request, response: Response) {
         let body = request.body as SubscriptionBody;
-        
-        if (!validator.isValidRequestBody<SubscriptionBody>(body)) {
-            this.sendError(response, validator.getErrorMessage<SubscriptionBody>(body), 400);
+        if (!this.subscribeBodyValidator.isValid(body)) {
+            Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
+            return this.subscribeBodyValidator.sendError(response, body);
         }
         try {
             let user = await this.userLayer.subscribe(body);
-            this.sendData(response, user, 200);
+            Logger.info(`successfully subscribed user (id=${body.userID}) to topic: ${body.topic}`);
+            return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error)
-            this.sendError(response, "Failed to subscribe user to webhook", 500);
+            return this.sendError(response, "Failed to subscribe user to webhook", StatusCodes.InternalError);
         }
     }
 
-    public async handleUnsubscription(request: Express.Request, response: Express.Response) {
-        let requiredFields = ["topic", "userID"]
-        let validator = new BodyValidator(requiredFields);
+    public async handleUnsubscription(request: Request, response: Response) {
         let body = request.body as UnsubscriptionBody;
-
-        if (!validator.isValidRequestBody<UnsubscriptionBody>(body)) {
-            this.sendError(response, validator.getErrorMessage<UnsubscriptionBody>(body), 400);
+        if (!this.unsubscribeBodyValidator.isValid(body)) {
+            Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
+            return this.unsubscribeBodyValidator.sendError(response, body);
         }
         try {
             let user = await this.userLayer.unsubscribe(body);
-            this.sendData(response, user, 200);
+            Logger.info(`successfully unsubscribed user (id=${body.userID}) from topic: ${body.topic}`);
+            return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error)
-            this.sendError(response, "Failed to unsubscribe user from webhook", 500);
+            return this.sendError(response, "Failed to unsubscribe user from webhook", StatusCodes.InternalError);
         }
     }
 }

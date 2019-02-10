@@ -1,38 +1,46 @@
-export default class BodyValidator {
+import IValidator from "./IValidator";
+import ErrorMessage from "../messages/ErrorMessage";
+import StatusCodes from "../routes/StatusCodes";
+import { Response } from "express"
+
+export default class BodyValidator<T> implements IValidator<T> {
     private properties: Array<string>;
 
     constructor(properties: Array<string>) {
         this.properties = properties;
     }
 
-    public isValidRequestBody<T>(body: T) {
-        if (this.isBodyEmpty<T>(body)) {
+    public isValid(body: T) {
+        if (this.isBodyEmpty(body)) {
             return false;
         }
+        let keys = Object.keys(body);
         for (let i = 0; i < this.properties.length; i++) {
-            if (!body.hasOwnProperty(this.properties[i])) {
+            if (keys.indexOf(this.properties[i]) == -1) {
                 return false;
             }
         }
         return true;
     }
 
-    private isBodyEmpty<T>(body: T) {
-        for (let entry in Object.entries(body)) {
-            return false;
-        };
-        return true;
+    private isBodyEmpty(body: T) {
+        return Object.keys(body).length == 0;
     }
 
-    public getErrorMessage<T>(body: T) {
-        if (this.isBodyEmpty<T>(body)) {
-            return "Body must not be empty"
+    public sendError(response: Response, body: T) {
+        response.json(this.getErrorMessage(body)).status(StatusCodes.BadRequest);
+    }
+
+    private getErrorMessage(body: T): ErrorMessage {
+        if (this.isBodyEmpty(body)) {
+            return new ErrorMessage("Body must not be empty")
         }
+        let keys = Object.keys(body);
         for (let i = 0; i < this.properties.length; i++) {
-            if (!body.hasOwnProperty(this.properties[i])) {
-                return `Body must contain a ${this.properties[i]} field`;
+            if (keys.indexOf(this.properties[i]) == -1) {
+                return new ErrorMessage(`Body must contain a ${this.properties[i]} field`);
             }
         }
-        return "Body is valid, this point should not be reached";
+        return new ErrorMessage("Body is valid, this point should not be reached");
     }
 }
