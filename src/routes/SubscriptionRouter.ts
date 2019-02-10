@@ -3,6 +3,8 @@ import * as Express from "express";
 import UserLayer from "../layers/UserLayer";
 import SubscriptionBody from "../bodys/SubscriptionBody";
 import BodyValidator from "../validators/BodyValidator";
+import { Logger } from "../config/Winston";
+import UnsubscriptionBody from "../bodys/UnsubscriptionBody";
 
 export default class SubscriptionRouter extends Router {
     private userLayer : UserLayer;
@@ -31,11 +33,25 @@ export default class SubscriptionRouter extends Router {
             let user = await this.userLayer.subscribe(body);
             this.sendData(response, user, 200);
         } catch (error) {
+            Logger.error(error)
             this.sendError(response, "Failed to subscribe user to webhook", 500);
         }
     }
 
-    public handleUnsubscription(request: Express.Request, response: Express.Response) {
-        
+    public async handleUnsubscription(request: Express.Request, response: Express.Response) {
+        let requiredFields = ["topic", "userID"]
+        let validator = new BodyValidator(requiredFields);
+        let body = request.body as UnsubscriptionBody;
+
+        if (!validator.isValidRequestBody<UnsubscriptionBody>(body)) {
+            this.sendError(response, validator.getErrorMessage<UnsubscriptionBody>(body), 400);
+        }
+        try {
+            let user = await this.userLayer.unsubscribe(body);
+            this.sendData(response, user, 200);
+        } catch (error) {
+            Logger.error(error)
+            this.sendError(response, "Failed to unsubscribe user from webhook", 500);
+        }
     }
 }
