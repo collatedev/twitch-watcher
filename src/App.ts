@@ -1,7 +1,8 @@
 import * as Express from "express"
 import * as BodyParser from "body-parser"
-import { Router } from "express-serve-static-core";
 import IRouter from "./routes/IRouter";
+import * as morgan from "morgan";
+import WinstonStream from "./config/Winston";
 
 export default class App {
     public app: Express.Application
@@ -15,6 +16,7 @@ export default class App {
         this.app.use(BodyParser.urlencoded({
             extended: false
         }));
+        this.app.use(morgan('combined', { stream: WinstonStream }));
     }
 
     public start(port: number) {
