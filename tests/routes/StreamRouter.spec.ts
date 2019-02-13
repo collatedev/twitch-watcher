@@ -9,10 +9,10 @@ use(sinonChai);
 
 describe('Subscription Router', () => {
     describe('handleChallenge', () => {
-
+        
     });
 
     describe('handleWebhookCall', () => {
-        
+
     })
 });

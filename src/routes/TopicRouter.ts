@@ -1,5 +1,6 @@
 import Router from "./Router"
 import { Request, Response } from "express"
+import StatusCodes from "./StatusCodes";
 
 export default abstract class TopicRouter extends Router {
     private topic : string;

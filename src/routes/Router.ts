@@ -4,15 +4,15 @@ import * as Path from "path";
 import ErrorMessage from "../messages/ErrorMessage";
 import DataMessage from "../messages/DataMessage";
 
-const ExpressRouter: Express.Router = Express.Router();
 const RootPath = '/api/v1/';
 
 export default abstract class Router implements IRouter {
-    protected router : Express.Router = ExpressRouter;
+    protected router : Express.Router;
     private basePath : string;
 
     constructor(path: string) {
         this.basePath = path;
+        this.router = Express.Router();
     }
 
     public getPath(): string {
@@ -20,7 +20,7 @@ export default abstract class Router implements IRouter {
     }
 
     public getRouter(): Express.Router {
-        return ExpressRouter;
+        return this.router;
     }
 
     protected sendError(response: Express.Response, message: string, status: number) {

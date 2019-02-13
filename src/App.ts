@@ -27,6 +27,7 @@ export default class App {
 
     public addRouter(router: IRouter) {
         router.setup();
+        console.log(router.getPath());
         this.app.use(router.getPath(), router.getRouter());
     }
 }
