@@ -9,8 +9,8 @@ import StatusCodes from "./StatusCodes";
 
 
 export default class SubscriptionRouter extends Router {
-    private readonly SubscribeFields = ["topic", "userID"];
-    private readonly UnsubscribeFields = ["callbackURL", "topic", "userID"];
+    private readonly UnsubscribeFields = ["topic", "userID"];
+    private readonly SubscribeFields = ["callbackURL", "topic", "userID"];
 
     private userLayer : UserLayer;
     private unsubscribeBodyValidator: BodyValidator<UnsubscriptionBody>;
@@ -33,7 +33,7 @@ export default class SubscriptionRouter extends Router {
     }
 
     public async handleSubscription(request: Request, response: Response) {
-        let body = request.body as SubscriptionBody;
+		let body = request.body as SubscriptionBody;
         if (!this.subscribeBodyValidator.isValid(body)) {
             Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
             return this.subscribeBodyValidator.sendError(response, body);
