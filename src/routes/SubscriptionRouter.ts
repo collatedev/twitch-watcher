@@ -9,8 +9,8 @@ import StatusCodes from "./StatusCodes";
 
 
 export default class SubscriptionRouter extends Router {
-    private readonly SubscribeFields = ["topic", "userID"];
-    private readonly UnsubscribeFields = ["callbackURL", "topic", "userID"];
+    private readonly UnsubscribeFields = ["topic", "userID"];
+    private readonly SubscribeFields = ["callbackURL", "topic", "userID"];
 
     private userLayer : UserLayer;
     private unsubscribeBodyValidator: BodyValidator<UnsubscriptionBody>;

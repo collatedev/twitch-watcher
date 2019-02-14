@@ -1,6 +1,5 @@
 import UserLayer from "../../src/layers/UserLayer";
-import SubscriptionBody from "../../src/bodys/SubscriptionBody";
-import TwitchUser from "../../src/schemas/TwitchUser";
+import SubscriptionBody from "../../src/schemas/SubscriptionBody";
 import FakeUserModel from "./FakeUserModel";
 import TwitchWebhook from "../../src/schemas/TwitchWebhook";
 
