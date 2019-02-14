@@ -2,7 +2,6 @@ import TopicRouter from "./TopicRouter";
 import WebhookBody from "../schemas/ChallengeBody";
 import { Logger } from "../config/Winston";
 import StreamBody from "../schemas/StreamBody";
-import BodyValidator from "../validators/BodyValidator";
 
 /* This is stored outside the class so the fields can be 
  * accessed by super and passed to the topic router to 
@@ -16,6 +15,8 @@ export default class StreamRouter extends TopicRouter<StreamBody> {
     }
 
     protected async handleWebhookData(body: WebhookBody): Promise<void> {
+        Logger.info(body);
+        //send data to message bus
         console.log(body);
     }
 }

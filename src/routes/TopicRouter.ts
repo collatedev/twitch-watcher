@@ -43,8 +43,19 @@ export default abstract class TopicRouter<T> extends Router {
             Logger.error(`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`);
             return this.hookDataValidator.sendError(response, body);
         }
-        await this.handleWebhookData(body);
-        this.sendData(response, null, StatusCodes.OK);
+        let processedData = true;
+        try {
+            await this.handleWebhookData(body);
+        } catch (error) {
+            Logger.error(error);
+            processedData = false;
+        }
+        
+        this.sendData(response, {
+            desc: `Recieved data under topic: ${this.topic}`,
+            body: body,
+            processedData: processedData
+        }, StatusCodes.OK);
     }
 
     protected abstract async handleWebhookData(body: T): Promise<void>;
