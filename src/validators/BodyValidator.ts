@@ -14,9 +14,10 @@ export default class BodyValidator<T> implements IValidator<T> {
         if (this.isBodyEmpty(body)) {
             return false;
         }
-        let keys = Object.keys(body);
+
+        let keys : Array<string> = this.getKeys(body);
         for (let i = 0; i < this.properties.length; i++) {
-            if (keys.indexOf(this.properties[i]) == -1) {
+            if (keys.indexOf(this.properties[i].trim()) == -1) {
                 return false;
             }
         }
@@ -35,12 +36,20 @@ export default class BodyValidator<T> implements IValidator<T> {
         if (this.isBodyEmpty(body)) {
             return new ErrorMessage("Body must not be empty")
         }
-        let keys = Object.keys(body);
+
+        let keys : Array<string> = this.getKeys(body);
         for (let i = 0; i < this.properties.length; i++) {
-            if (keys.indexOf(this.properties[i]) == -1) {
+            if (keys.indexOf(this.properties[i].trim()) == -1) {
                 return new ErrorMessage(`Body must contain a ${this.properties[i]} field`);
             }
         }
         return new ErrorMessage("Body is valid, this point should not be reached");
+    }
+
+    private getKeys(body: T) {
+        let keys = Object.keys(body);
+        return keys.map((key) => {
+            return key.trim();
+        });
     }
 }

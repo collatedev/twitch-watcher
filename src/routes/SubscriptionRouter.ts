@@ -1,16 +1,16 @@
 import Router from "./Router";
 import { Request, Response } from "express";
 import UserLayer from "../layers/UserLayer";
-import SubscriptionBody from "../bodys/SubscriptionBody";
+import SubscriptionBody from "../schemas/SubscriptionBody";
 import BodyValidator from "../validators/BodyValidator";
 import { Logger } from "../config/Winston";
-import UnsubscriptionBody from "../bodys/UnsubscriptionBody";
+import UnsubscriptionBody from "../schemas/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 
 
 export default class SubscriptionRouter extends Router {
-    readonly unsubscribeFields = ["topic", "userID"];
-    readonly subscribeFields = ["callbackURL", "topic", "userID"];
+    private readonly SubscribeFields = ["topic", "userID"];
+    private readonly UnsubscribeFields = ["callbackURL", "topic", "userID"];
 
     private userLayer : UserLayer;
     private unsubscribeBodyValidator: BodyValidator<UnsubscriptionBody>;
@@ -19,8 +19,9 @@ export default class SubscriptionRouter extends Router {
     constructor(userLayer: UserLayer) {
         super('/user/subscriptions');
         this.userLayer = userLayer;
-        this.unsubscribeBodyValidator = new BodyValidator<UnsubscriptionBody>(this.unsubscribeFields);
-        this.subscribeBodyValidator = new BodyValidator<SubscriptionBody>(this.subscribeFields);
+        
+        this.unsubscribeBodyValidator = new BodyValidator<UnsubscriptionBody>(this.UnsubscribeFields);
+        this.subscribeBodyValidator = new BodyValidator<SubscriptionBody>(this.SubscribeFields);
 
         this.handleSubscription = this.handleSubscription.bind(this);
         this.handleUnsubscription = this.handleUnsubscription.bind(this);

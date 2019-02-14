@@ -1,7 +1,7 @@
 import UserModel from "../models/UserModel";
-import SubscriptionBody from "../bodys/SubscriptionBody";
+import SubscriptionBody from "../schemas/SubscriptionBody";
 import TwitchUser from "../schemas/TwitchUser";
-import UnsubscriptionBody from "../bodys/UnsubscriptionBody";
+import UnsubscriptionBody from "../schemas/UnsubscriptionBody";
 
 export default class UserLayer {
     protected userModel: UserModel;
