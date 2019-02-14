@@ -11,7 +11,7 @@ export default class BodyValidator<T> implements IValidator<T> {
     }
 
     public isValid(body: T) {
-        if (this.isBodyEmpty(body)) {
+        if (this.properties.length != 0 && this.isBodyEmpty(body)) {
             return false;
         }
 

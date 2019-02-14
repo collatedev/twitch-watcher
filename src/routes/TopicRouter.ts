@@ -34,7 +34,7 @@ export default abstract class TopicRouter<T> extends Router {
             Logger.error('Did Twitch challenge data change? Or has Twitch Services failed?');
             return this.challengeValidator.sendError(response, body);
         }
-        return response.send(body["hub.challenge"]);
+        return response.send(body["hub.challenge"]).status(StatusCodes.OK);
     }
 
     public async handleWebhookCall(request: Request, response: Response) {
@@ -43,6 +43,7 @@ export default abstract class TopicRouter<T> extends Router {
             Logger.error(`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`);
             return this.hookDataValidator.sendError(response, body);
         }
+        
         let processedData = true;
         try {
             await this.handleWebhookData(body);
@@ -51,11 +52,12 @@ export default abstract class TopicRouter<T> extends Router {
             processedData = false;
         }
         
+        let status = processedData ? StatusCodes.OK : StatusCodes.InternalError;
         this.sendData(response, {
             desc: `Recieved data under topic: ${this.topic}`,
             body: body,
             processedData: processedData
-        }, StatusCodes.OK);
+        }, status);
     }
 
     protected abstract async handleWebhookData(body: T): Promise<void>;
