@@ -1,8 +1,4 @@
-export default interface StreamBody {
-    data: Array<StreamData>;
-}
-
-interface StreamData {
+export default interface IStreamData {
 	id: number;
 	user_id: number;
 	user_name: string;

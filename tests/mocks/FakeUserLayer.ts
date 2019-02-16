@@ -1,8 +1,7 @@
 import UserLayer from "../../src/layers/UserLayer";
-import SubscriptionBody from "../../src/schemas/SubscriptionBody";
-import TwitchUser from "../../src/schemas/TwitchUser";
+import SubscriptionBody from "../../src/schemas/request/SubscriptionBody";
 import FakeUserModel from "./FakeUserModel";
-import TwitchWebhook from "../../src/schemas/TwitchWebhook";
+import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";
 
 export default class FakeUserLayer extends UserLayer {
     constructor(userModel: FakeUserModel) {

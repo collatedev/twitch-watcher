@@ -16,6 +16,7 @@ export default class App {
         this.app.use(BodyParser.urlencoded({
             extended: false
         }));
+        
         this.app.use(morgan('combined', { stream: Stream }));
     }
 

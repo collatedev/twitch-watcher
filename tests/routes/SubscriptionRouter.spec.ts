@@ -8,8 +8,8 @@ import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
 import UserLayer from "../../src/layers/UserLayer";
 import FakeUserLayer from "../mocks/FakeUserLayer";
-import TwitchUser from "../../src/schemas/TwitchUser";
-import TwitchWebhook from "../../src/schemas/TwitchWebhook";
+import TwitchUser from "../../src/schemas/user/TwitchUser";
+import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";
 
 use(sinonChai);
 
@@ -24,7 +24,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must not be empty")
+                new ErrorMessage("Body is missing property: 'callbackURL' it is either null or undefined")
             );
         })
 
@@ -42,7 +42,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must contain a topic field")
+                new ErrorMessage("Body is missing property: 'topic' it is either null or undefined")
             );
         })
 
@@ -60,7 +60,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must contain a callbackURL field")
+                new ErrorMessage("Body is missing property: 'callbackURL' it is either null or undefined")
             );
         })
 
@@ -78,7 +78,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must contain a userID field")
+                new ErrorMessage("Body is missing property: 'userID' it is either null or undefined")
             );
         })
 
@@ -133,7 +133,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must not be empty")
+                new ErrorMessage("Body is missing property: 'topic' it is either null or undefined")
             );
         })
 
@@ -150,7 +150,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must contain a topic field")
+                new ErrorMessage("Body is missing property: 'topic' it is either null or undefined")
             );
         })
 
@@ -167,7 +167,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body must contain a userID field")
+                new ErrorMessage("Body is missing property: 'userID' it is either null or undefined")
             );
         })
 
