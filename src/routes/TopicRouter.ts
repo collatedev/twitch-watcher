@@ -1,17 +1,16 @@
 import Router from "./Router"
 import { Request, Response } from "express"
-import BodyValidator from "../validators/BodyValidator";
-import ChallengeBody from "../schemas/ChallengeBody";
+import PartialQueryValidator from "../validators/PartialQueryValidator";
+import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../config/Winston";
+import IValidatable from "../validators/IValidatable";
+import PartialBodyValidator from "../validators/PartialBodyValidator";
+import QueryValidator from "../validators/QueryValidator";
 
-export default abstract class TopicRouter<T> extends Router {
-    private readonly WebhookCallFields : Array<string> = [
-        "hub.mode", "hub.topic", "hub.lease_seconds", 
-        "hub.challenge", 
-    ];
-    private challengeValidator: BodyValidator<ChallengeBody>;
-    private hookDataValidator: BodyValidator<T>;
+export default abstract class TopicRouter<T extends IValidatable> extends Router {
+    private challengeValidator: QueryValidator<ChallengeQuery>;
+    private hookDataValidator: PartialBodyValidator<T>;
     private topic : string;
 
     constructor(topic: string, requiredFields: Array<string>) {
@@ -19,8 +18,8 @@ export default abstract class TopicRouter<T> extends Router {
         this.topic = topic;
         this.handleChallenge = this.handleChallenge.bind(this);
         this.handleWebhookCall = this.handleWebhookCall.bind(this);
-        this.challengeValidator = new BodyValidator<ChallengeBody>(this.WebhookCallFields);
-        this.hookDataValidator = new BodyValidator<T>(requiredFields);
+        this.challengeValidator = new QueryValidator<ChallengeQuery>();
+        this.hookDataValidator = new PartialBodyValidator<T>(requiredFields);
     }
 
     public setup() {
@@ -29,7 +28,7 @@ export default abstract class TopicRouter<T> extends Router {
     }
 
     public async handleChallenge(request: Request, response: Response) {
-        let body : ChallengeBody = request.query as ChallengeBody;
+		let body : ChallengeQuery = new ChallengeQuery(request.query);
         if (!this.challengeValidator.isValid(body)) {
             Logger.error('Did Twitch challenge data change? Or has Twitch Services failed?');
             return this.challengeValidator.sendError(response, body);

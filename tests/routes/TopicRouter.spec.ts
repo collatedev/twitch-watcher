@@ -19,7 +19,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must not be empty")
+				new ErrorMessage("Query is missing property: 'hub.topic' it is either null or undefined")
 			);
 		});
 
@@ -38,7 +38,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must contain a hub.mode field")
+				new ErrorMessage("Query is missing property: 'hub.mode' it is either null or undefined")
 			);
 		});
 
@@ -57,7 +57,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must contain a hub.topic field")
+				new ErrorMessage("Query is missing property: 'hub.topic' it is either null or undefined")
 			);
 		});
 
@@ -76,7 +76,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must contain a hub.lease_seconds field")
+				new ErrorMessage("Query is missing property: 'hub.lease_seconds' it is either null or undefined")
 			);
 		});
 
@@ -95,7 +95,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must contain a hub.challenge field")
+				new ErrorMessage("Query is missing property: 'hub.challenge' it is either null or undefined")
 			);
 		});
 

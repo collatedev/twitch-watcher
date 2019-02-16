@@ -1,7 +1,7 @@
 import UserModel from "../models/UserModel";
-import SubscriptionBody from "../schemas/SubscriptionBody";
-import TwitchUser from "../schemas/TwitchUser";
-import UnsubscriptionBody from "../schemas/UnsubscriptionBody";
+import SubscriptionBody from "../schemas/request/SubscriptionBody";
+import TwitchUser from "../schemas/user/TwitchUser";
+import UnsubscriptionBody from "../schemas/request/IUnsubscriptionBody";
 
 export default class UserLayer {
     protected userModel: UserModel;
@@ -19,9 +19,9 @@ export default class UserLayer {
     }
 
     public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
-        let user = this.userModel.getByID(subscriptionBody.userID);
+		let user = this.userModel.getByID(subscriptionBody.userID);
         return user;
-    }
+	}
 
     public async unsubscribe(unsubscriptionBody: UnsubscriptionBody) {
         let user = this.userModel.getByID(unsubscriptionBody.userID);

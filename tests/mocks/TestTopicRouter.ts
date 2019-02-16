@@ -1,8 +1,13 @@
 import TopicRouter from "../../src/routes/TopicRouter";
+import Validatable from "../../src/validators/Validatable";
 
 const TestBodyFields : Array<string> = [];
 
-export default class TestTopicRouter extends TopicRouter<{}> {    
+class TestBody extends Validatable {
+
+}
+
+export default class TestTopicRouter extends TopicRouter<TestBody> {    
     private shouldFail: boolean
 
     constructor() {

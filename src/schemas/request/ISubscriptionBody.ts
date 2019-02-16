@@ -1,4 +1,4 @@
-export default interface SubscriptionBody {
+export default interface ISubscriptionBody {
     callbackURL: string
     topic: string
     userID: number

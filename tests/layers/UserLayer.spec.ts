@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import UserLayer from '../../src/layers/UserLayer'
 import FakeUserModel from '../../src/models/UserModel'
 import 'mocha';
-import TwitchUser from '../../src/schemas/TwitchUser';
+import TwitchUser from '../../src/schemas/user/TwitchUser';
 
 describe('User Layer', () => {
     describe('getUserInfo', () => {

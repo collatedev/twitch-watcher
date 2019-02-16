@@ -18,10 +18,6 @@ export default class App {
         }));
         
         this.app.use(morgan('combined', { stream: Stream }));
-        
-        this.app.use((request: any, response: any) => {
-            console.log("send request to http logging service");
-        });
     }
 
     public start(port: number) {
