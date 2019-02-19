@@ -8,7 +8,7 @@ import StreamBody from "../schemas/request/StreamBody";
 */
 const StreamBodyFields : Array<string> = ["data"];
 
-export default class StreamRouter extends TopicRouter<StreamBody> {    
+export default class StreamRouter extends TopicRouter<StreamBody> {	
     constructor() {
         super('/streams', StreamBodyFields);
     }

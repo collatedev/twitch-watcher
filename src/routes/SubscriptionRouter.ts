@@ -37,7 +37,7 @@ export default class SubscriptionRouter extends Router {
         }
         try {
             let user = await this.userLayer.subscribe(body);
-            Logger.info(`successfully subscribed user (id=${body.userID}) to topic: ${body.topic}`);
+            Logger.info(`successfully subscribed user (id=${body.userID}) to webhooks`);
             return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error)
@@ -53,7 +53,7 @@ export default class SubscriptionRouter extends Router {
         }
         try {
             let user = await this.userLayer.unsubscribe(body);
-            Logger.info(`successfully unsubscribed user (id=${body.userID}) from topic: ${body.topic}`);
+            Logger.info(`successfully unsubscribed user (id=${body.userID}) from webhooks`);
             return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error)

@@ -1,13 +1,13 @@
 import IUnsubscriptionBody from "./IUnsubscriptionBody";
 import Validatable from "../../validators/Validatable";
+import ITwitchBody from "./ITwitchBody";
 
-export default class UnsubscriptionBody extends Validatable implements IUnsubscriptionBody {
-	topic: string;
+export default class UnsubscriptionBody extends Validatable implements IUnsubscriptionBody, ITwitchBody {
 	userID: number;
+	callbackURL: string;
 
 	constructor(body: any) {
 		super();
-		this.topic = body.topic;
 		this.userID = body.userID;
 	}
 }

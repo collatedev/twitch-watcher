@@ -30,7 +30,7 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
     public async handleChallenge(request: Request, response: Response) {
 		let body : ChallengeQuery = new ChallengeQuery(request.query);
         if (!this.challengeValidator.isValid(body)) {
-            Logger.error('Did Twitch challenge data change? Or has Twitch Services failed?');
+            Logger.error(`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`);
             return this.challengeValidator.sendError(response, body);
         }
         return response.send(body["hub.challenge"]).status(StatusCodes.OK);
