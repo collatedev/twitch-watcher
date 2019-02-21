@@ -30,13 +30,13 @@ export default class SubscriptionRouter extends Router {
     }
 
     public async handleSubscription(request: Request, response: Response) {
-        let body = new SubscriptionBody(request.body);
+        const body = new SubscriptionBody(request.body);
         if (!this.subscribeBodyValidator.isValid(body)) {
             Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
             return this.subscribeBodyValidator.sendError(response, body);
         }
         try {
-            let user = await this.userLayer.subscribe(body);
+            const user = await this.userLayer.subscribe(body);
             Logger.info(`successfully subscribed user (id=${body.userID}) to webhooks`);
             return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
@@ -46,13 +46,13 @@ export default class SubscriptionRouter extends Router {
     }
 
     public async handleUnsubscription(request: Request, response: Response) {
-        let body = new UnsubscriptionBody(request.body);
+        const body = new UnsubscriptionBody(request.body);
         if (!this.unsubscribeBodyValidator.isValid(body)) {
             Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
             return this.unsubscribeBodyValidator.sendError(response, body);
         }
         try {
-            let user = await this.userLayer.unsubscribe(body);
+            const user = await this.userLayer.unsubscribe(body);
             Logger.info(`successfully unsubscribed user (id=${body.userID}) from webhooks`);
             return this.sendData(response, user, StatusCodes.OK);
         } catch (error) {

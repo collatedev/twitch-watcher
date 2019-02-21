@@ -1,11 +1,7 @@
 import TopicRouter from "../../src/routes/TopicRouter";
-import Validatable from "../../src/validators/Validatable";
+import TestBody from "./TestBody";
 
-const TestBodyFields : Array<string> = [];
-
-class TestBody extends Validatable {
-
-}
+const TestBodyFields : string[] = ["a"];
 
 export default class TestTopicRouter extends TopicRouter<TestBody> {    
     private shouldFail: boolean
@@ -18,7 +14,7 @@ export default class TestTopicRouter extends TopicRouter<TestBody> {
         this.shouldFail = true;
     }
 
-    protected async handleWebhookData(body: {}): Promise<void> {
+    protected async handleWebhookData(body: TestBody): Promise<void> {
         if (this.shouldFail) {
             throw new Error('failed processing data');
         }

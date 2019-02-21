@@ -1,6 +1,5 @@
 import Router from "./Router"
 import { Request, Response } from "express"
-import PartialQueryValidator from "../validators/PartialQueryValidator";
 import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../config/Winston";
@@ -13,7 +12,7 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
     private hookDataValidator: PartialBodyValidator<T>;
     private topic : string;
 
-    constructor(topic: string, requiredFields: Array<string>) {
+    constructor(topic: string, requiredFields: string[]) {
         super(`/topic`);
         this.topic = topic;
         this.handleChallenge = this.handleChallenge.bind(this);
@@ -28,16 +27,18 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
     }
 
     public async handleChallenge(request: Request, response: Response) {
-		let body : ChallengeQuery = new ChallengeQuery(request.query);
+		const body : ChallengeQuery = new ChallengeQuery(request.query);
         if (!this.challengeValidator.isValid(body)) {
             Logger.error(`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`);
             return this.challengeValidator.sendError(response, body);
-        }
-        return response.send(body["hub.challenge"]).status(StatusCodes.OK);
-    }
+        } else {
+			return response.send(body["hub.challenge"]).status(StatusCodes.OK);
+		}
+	}
+    
 
     public async handleWebhookCall(request: Request, response: Response) {
-        let body : T = request.body as T;
+        const body : T = request.body as T;
         if (!this.hookDataValidator.isValid(body)) {
             Logger.error(`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`);
             return this.hookDataValidator.sendError(response, body);
@@ -50,12 +51,12 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
             Logger.error(error);
             processedData = false;
         }
-        
-        let status = processedData ? StatusCodes.OK : StatusCodes.InternalError;
+
+        const status = processedData ? StatusCodes.OK : StatusCodes.InternalError;
         this.sendData(response, {
             desc: `Recieved data under topic: ${this.topic}`,
-            body: body,
-            processedData: processedData
+            body,
+            processedData,
         }, status);
     }
 

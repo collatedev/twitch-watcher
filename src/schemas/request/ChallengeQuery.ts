@@ -2,10 +2,10 @@ import IChallengeQuery from "./IChallengeQuery";
 import Validatable from "../../validators/Validatable";
 
 export default class ChallengeQuery extends Validatable implements IChallengeQuery {
-	public 'hub.topic': string;	
-	public 'hub.lease_seconds': number;
-	public 'hub.mode': string;
-	public 'hub.challenge': string;
+	public readonly 'hub.topic': string;	
+	public readonly 'hub.lease_seconds': number;
+	public readonly 'hub.mode': string;
+	public readonly 'hub.challenge': string;
 
 	constructor(body: any) {
 		super();

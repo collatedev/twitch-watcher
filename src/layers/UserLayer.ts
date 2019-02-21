@@ -20,13 +20,13 @@ export default class UserLayer {
     }
 
     public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
-		let user = this.userModel.getByID(subscriptionBody.userID); // should be the user service library
+		const user = this.userModel.getByID(subscriptionBody.userID); // should be the user service library
 		await Twitch.subscribe(subscriptionBody);
         return user;
 	}
 
     public async unsubscribe(unsubscriptionBody: UnsubscriptionBody) {
-        let user = this.userModel.getByID(unsubscriptionBody.userID);
+        const user = this.userModel.getByID(unsubscriptionBody.userID);
         return user;
     }
 }

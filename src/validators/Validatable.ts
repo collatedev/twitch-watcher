@@ -1,7 +1,7 @@
 import IValidatable from "../validators/IValidatable";
 
 export default class Validatable implements IValidatable {
-	getProperties() {
+	public getProperties() {
 		return Object.keys(this);
 	}
 }

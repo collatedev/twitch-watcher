@@ -3,7 +3,7 @@ import IStreamBody from "./IStreamBody";
 import IStreamData from "./IStreamData";
 
 export default class StreamBody extends Validatable implements IStreamBody {
-	data: Array<IStreamData>;
+	public readonly data: IStreamData[];
 
 	constructor(body: any) {
 		super();

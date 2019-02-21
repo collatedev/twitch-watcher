@@ -6,7 +6,7 @@ import StreamBody from "../schemas/request/StreamBody";
  * accessed by super and passed to the topic router to 
  * create the Body Validator
 */
-const StreamBodyFields : Array<string> = ["data"];
+const StreamBodyFields : string[] = ["data"];
 
 export default class StreamRouter extends TopicRouter<StreamBody> {	
     constructor() {
@@ -15,6 +15,6 @@ export default class StreamRouter extends TopicRouter<StreamBody> {
 
     protected async handleWebhookData(body: StreamBody): Promise<void> {
 		Logger.info(`Stream webhook recieved body: ${body}`);
-		
+		throw new Error("Not yet implemented");
     }
 }

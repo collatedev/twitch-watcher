@@ -1,6 +1,6 @@
 import TwitchRequest from "./TwitchRequest";
 import TwitchSubscription from "./TwitchSubscription";
-import HTTPRequestBuilder from "../http/HTTPRequestBuilder";
+import HTTPRequestBuilder from "../request_builder/HTTPRequestBuilder";
 
 export default class SubscribeRequest extends TwitchRequest {
 	constructor(subscription: TwitchSubscription, requestBuilder: HTTPRequestBuilder) {

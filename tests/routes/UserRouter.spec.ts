@@ -11,17 +11,31 @@ import UserLayer from "../../src/layers/UserLayer";
 use(sinonChai);
 
 describe('User Router', () => {
+	describe('setup', () => {
+		const router = new UserRouter(new UserLayer(new FakeUserModel()));
+
+		try {
+			router.setup();
+		} catch (error) {
+			throw error;
+		}
+	})
+
     describe('getUserByID', () => {
         it('Should fail due to a string userID', async () => {
-            let router = new UserRouter(new UserLayer(new FakeUserModel()));
-            let request = mockReq({
+            const router = new UserRouter(new UserLayer(new FakeUserModel()));
+            const request = mockReq({
                 params: {
                     userID: "String"
                 }
             })
-            let response = mockRes();
+            const response = mockRes();
 
-            await router.getUserByID(request, response);
+            try {
+				await router.getUserByID(request, response);
+			} catch(error) {
+				throw error;
+			}
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
@@ -30,15 +44,19 @@ describe('User Router', () => {
         });
 
         it('Should fail due to a float userID', async () => {
-            let router = new UserRouter(new UserLayer(new FakeUserModel()));
-            let request = mockReq({
+            const router = new UserRouter(new UserLayer(new FakeUserModel()));
+            const request = mockReq({
                 params: {
                     userID: 1.1
                 }
             })
-            let response = mockRes();
+            const response = mockRes();
 
-            await router.getUserByID(request, response);
+            try {
+				await router.getUserByID(request, response);
+			} catch(error) {
+				throw error;
+			}
 
             expect(response.status).to.have.been.calledWith(400);
             expect(response.json).to.have.been.calledWith(
@@ -47,15 +65,19 @@ describe('User Router', () => {
         });
 
         it('Should fail because user does not exist', async () => {
-            let router = new UserRouter(new UserLayer(new FakeUserModel()));
-            let request = mockReq({
+            const router = new UserRouter(new UserLayer(new FakeUserModel()));
+            const request = mockReq({
                 params: {
                     userID: 1
                 }
             })
-            let response = mockRes();
+            const response = mockRes();
 
-            await router.getUserByID(request, response);
+            try {
+				await router.getUserByID(request, response);
+			} catch(error) {
+				throw error;
+			}
 
             expect(response.status).to.have.been.calledWith(404);
             expect(response.json).to.have.been.calledWith(
@@ -64,21 +86,27 @@ describe('User Router', () => {
         });
 
         it('Should get user data', async () => {
-            let twitchModel = new FakeUserModel();
-            let userLayer = new UserLayer(twitchModel);
-            let router = new UserRouter(userLayer);
-            let request = mockReq({
+            const twitchModel = new FakeUserModel();
+            const userLayer = new UserLayer(twitchModel);
+            const router = new UserRouter(userLayer);
+            const request = mockReq({
                 params: {
                     userID: 1
                 }
             })
-            let response = mockRes();
+            const response = mockRes();
             twitchModel.addUser(1);
 
-            await router.getUserByID(request, response);
+            try {
+				await router.getUserByID(request, response);
+			} catch(error) {
+				throw error;
+			}
 
             expect(response.status).to.have.been.calledWith(200);
-            expect(response.json).to.have.been.calledWith(new DataMessage(await twitchModel.getByID(1)));
+            expect(response.json).to.have.been.calledWith(
+				new DataMessage(await twitchModel.getByID(1))
+			);
         });
     })
 });

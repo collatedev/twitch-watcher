@@ -1,7 +1,7 @@
 import Message from "./Message"
 
 export default class DataMessage extends Message {
-	private data: Object;
+	private data: object;
 
 	constructor(data: object) {
 		super("Success", true);

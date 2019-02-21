@@ -1,85 +1,88 @@
 import { use, expect } from 'chai';
 import 'mocha';
 import TestPartialValidator from "../mocks/TestPartialValidator"
-import Validatable from "../../src/validators/Validatable";
+import ComplexPartialBody from "./ComplexPartialBody";
+import TestPartialBody from "./TestPartialBody";
 import { mockRes } from 'sinon-express-mock';
 import * as sinonChai from 'sinon-chai'
 import ErrorMessage from '../../src/messages/ErrorMessage';
 
 use(sinonChai);
 
-class TestBody extends Validatable {
-	a: string;
-	
-	constructor(body: any) {
-		super();
-		this.a = body.a;
-	}
-}
-
 describe('PartialBodyValidator', () => {
 	describe('isValid', () => {
 		it('Should fail because body is empty', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
 			
-			let body = new TestBody({});
+			const body = new TestPartialBody({});
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because body has incorrect properties', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
 			
-			let body = Object.assign({
+			const body = Object.assign({
 				e: 1
-			}) as TestBody;
+			}) as TestPartialBody;
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because of undefined required values', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
 			
-			let body = new TestBody({});
+			const body = new TestPartialBody({});
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because of null required values', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
 			
-			let body = new TestBody({
+			const body = new TestPartialBody({
 				a: null
 			});
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should be valid because body is empty and there are no required fields', () => {
-			let validator = new TestPartialValidator<TestBody>([]);
+			const validator = new TestPartialValidator<TestPartialBody>([]);
 			
-			let body = {} as TestBody
+			const body = {} as TestPartialBody
 			
-			expect(validator.isValid(body)).to.be.true; 
+			expect(validator.isValid(body)).to.equal(true); 
+		});
+
+		it('Should return true because body is valid', () => {
+			const validator = new TestPartialValidator<ComplexPartialBody>(["a", "c"]);
+			
+			const body = new ComplexPartialBody({
+				a: "",
+				c: ""
+			});
+
+			expect(validator.isValid(body)).to.equal(true); 
 		});
 		
 		it('Should return true because body is valid', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
 			
-			let body : TestBody = new TestBody({
+			const body : TestPartialBody = new TestPartialBody({
 				a: "asdf"
 			});
 			
-			expect(validator.isValid(body)).to.be.true; 
+			expect(validator.isValid(body)).to.equal(true); 
 		});
 	});
 
 	describe('sendError', () => {
 		it('Should send a body is empty error', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
-			let response = mockRes();
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
+			const response = mockRes();
 			
-			let body = {} as TestBody
+			const body = {} as TestPartialBody
 			validator.sendError(response, body);
 
 			expect(response.json).to.have.been.calledWith(
@@ -89,12 +92,12 @@ describe('PartialBodyValidator', () => {
 		});
 
 		it('Should send a property missing message', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
-			let response = mockRes();
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
+			const response = mockRes();
 
-			let body = Object.assign({
+			const body = Object.assign({
 				e: 1
-			}) as TestBody;
+			}) as TestPartialBody;
 			validator.sendError(response, body);
 
 			expect(response.json).to.have.been.calledWith(
@@ -104,10 +107,10 @@ describe('PartialBodyValidator', () => {
 		});
 
 		it('Should send a null property message', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
-			let response = mockRes();
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
+			const response = mockRes();
 
-			let body = new TestBody({
+			const body = new TestPartialBody({
 				a: null
 			});
 			validator.sendError(response, body);
@@ -119,10 +122,10 @@ describe('PartialBodyValidator', () => {
 		});
 
 		it('Should send a undefined property message', () => {
-			let validator = new TestPartialValidator<TestBody>(["a"]);
-			let response = mockRes();
+			const validator = new TestPartialValidator<TestPartialBody>(["a"]);
+			const response = mockRes();
 
-			let body = new TestBody({
+			const body = new TestPartialBody({
 				a: undefined
 			});
 			validator.sendError(response, body);

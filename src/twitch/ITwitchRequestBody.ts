@@ -1,4 +1,4 @@
-export default interface ITwitchSubscriptionRequestBody {
+export default interface ITwitchRequestBody {
 	"hub.mode": string
 	"hub.topic": string
 	"hub.callback": string

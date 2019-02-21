@@ -20,6 +20,6 @@ export default class FakeUserModel extends UserModel {
         if (!this.db.hasOwnProperty(id)) {
             throw new Error(`Failed to get twitch user with id: ${id} from database`);
         }
-        return await this.db[id];
+        return this.db[id];
     }
 }

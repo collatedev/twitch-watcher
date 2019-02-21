@@ -4,7 +4,7 @@ import { StreamOptions } from "morgan";
 import { TransformableInfo, Format } from 'logform';
 
 // define the custom settings for each transport (file, console)
-let options = {
+const options = {
 	file: {
 		level: 'info',
 		filename: path.resolve(__dirname, '..', '..', 'logs', 'app.log'),
@@ -32,7 +32,7 @@ let options = {
 };
 
 // instantiate a new Winston Logger with the settings defined above
-let Logger = Winston.createLogger({
+const Logger = Winston.createLogger({
 	transports: process.env.NODE_ENV !== 'test' ? [
 		new Winston.transports.File(options.file),
 		new Winston.transports.Console(options.console)
@@ -73,8 +73,8 @@ function devFormat() {
 }
 
 // create a stream object with a 'write' function that will be used by `morgan`
-let Stream : StreamOptions = {
-	write: function(message: string) {
+const Stream : StreamOptions = {
+	write: (message: string) => {
 		// use the 'info' log level so the output will be picked up by both transports (file and console)
 		Logger.info(message);
 	},

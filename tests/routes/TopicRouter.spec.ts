@@ -9,13 +9,27 @@ import DataMessage from '../../src/messages/DataMessage';
 use(sinonChai);
 
 describe('Topic Router', () => {
+	describe('setup', () => {
+		const router = new TestTopicRouter();
+		
+		try {
+			router.setup();
+		} catch(error) {
+			throw error;
+		}
+	})
+
 	describe('handleChallenge', () => {
 		it('Should fail because there the query is empty', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq();
-			let response = mockRes();
+			const router = new TestTopicRouter();
+			const request = mockReq();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
@@ -24,17 +38,21 @@ describe('Topic Router', () => {
 		});
 
 		it('Should fail because hub.mode is missing', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq({
+			const router = new TestTopicRouter();
+			const request = mockReq({
 				query: {
 					"hub.topic": "value",
 					"hub.lease_seconds": 123,
 					"hub.challenge": "challenge token"
 				}
 			});
-			let response = mockRes();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
@@ -43,17 +61,21 @@ describe('Topic Router', () => {
 		});
 
 		it('Should fail because hub.topic is missing', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq({
+			const router = new TestTopicRouter();
+			const request = mockReq({
 				query: {
 					"hub.mode": "value",
 					"hub.lease_seconds": 123,
 					"hub.challenge": "challenge token"
 				}
 			});
-			let response = mockRes();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
@@ -62,17 +84,21 @@ describe('Topic Router', () => {
 		});
 
 		it('Should fail because hub.lease_seconds is missing', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq({
+			const router = new TestTopicRouter();
+			const request = mockReq({
 				query: {
 					"hub.topic": "value",
 					"hub.mode": "value",
 					"hub.challenge": "challenge token"
 				}
 			});
-			let response = mockRes();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
@@ -81,17 +107,21 @@ describe('Topic Router', () => {
 		});
 
 		it('Should fail because hub.challenge is missing', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq({
+			const router = new TestTopicRouter();
+			const request = mockReq({
 				query: {
 					"hub.topic": "value",
 					"hub.mode": "value",
 					"hub.lease_seconds": 123
 				}
 			});
-			let response = mockRes();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(400);
 			expect(response.json).to.have.been.calledWith(
@@ -100,8 +130,8 @@ describe('Topic Router', () => {
 		});
 
 		it('Should call send with challenge token', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq({
+			const router = new TestTopicRouter();
+			const request = mockReq({
 				query: {
 					"hub.topic": "value",
 					"hub.mode": "value",
@@ -109,9 +139,13 @@ describe('Topic Router', () => {
 					"hub.challenge": "challenge_token"
 				}
 			});
-			let response = mockRes();
+			const response = mockRes();
 
-			await router.handleChallenge(request, response);
+			try {
+				await router.handleChallenge(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(200);
 			expect(response.send).to.have.been.calledWith("challenge_token");
@@ -119,36 +153,70 @@ describe('Topic Router', () => {
 	});
 
 	describe('handleWebhookCall', () => {
-		it('Should fail to process data', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq();
-			let response = mockRes();
+		it('Should fail because body is not valid', async () => {
+			const router = new TestTopicRouter();
+			const request = mockReq();
+			const response = mockRes();
 			router.failNextRequest();
 
-			await router.handleWebhookCall(request, response);
+			try {
+				await router.handleWebhookCall(request, response);
+			} catch(error) {
+				throw error;
+			}
+
+			expect(response.status).to.have.been.calledWith(400);
+			expect(response.json).to.have.been.calledWith(
+				new ErrorMessage("Body must not be empty")
+			);
+		});
+
+		it('Should fail to process data', async () => {
+			const router = new TestTopicRouter();
+			const request = mockReq({
+				body: {
+					a: true
+				}
+			});
+			const response = mockRes();
+			router.failNextRequest();
+
+			try {
+				await router.handleWebhookCall(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(500);
 			expect(response.json).to.have.been.calledWith(
 				new DataMessage({
 					desc: `Recieved data under topic: /test`,
-					body: {},
+					body: { a: true },
 					processedData: false
 				})
 			);
 		});
 
 		it('Should process data', async () => {
-			let router = new TestTopicRouter();
-			let request = mockReq();
-			let response = mockRes();
+			const router = new TestTopicRouter();
+			const request = mockReq({
+				body: {
+					a: true
+				}
+			});
+			const response = mockRes();
 
-			await router.handleWebhookCall(request, response);
+			try {
+				await router.handleWebhookCall(request, response);
+			} catch(error) {
+				throw error;
+			}
 
 			expect(response.status).to.have.been.calledWith(200);
 			expect(response.json).to.have.been.calledWith(
 				new DataMessage({
 					desc: `Recieved data under topic: /test`,
-					body: {},
+					body: { a: true },
 					processedData: true
 				})
 			);

@@ -18,13 +18,13 @@ export default class UserRouter extends Router {
 	}
 
 	public async getUserByID(request: Express.Request, response: Express.Response) {
-		let userID = parseFloat(request.params.userID);
+		const userID = parseFloat(request.params.userID);
 		if (!this.isValidID(userID)) {
 			Logger.error("")
 			this.sendError(response, `The Twitch User ID must be a positive integer value, instead received '${userID}'`, StatusCodes.BadRequest);
 		}
 		try {
-			let user = await this.userLayer.getUserInfo(userID);
+			const user = await this.userLayer.getUserInfo(userID);
 			Logger.info(`Successfully got user: ${JSON.stringify(user)}`);
 			this.sendData(response, user, StatusCodes.OK);
 		} catch (error) {
@@ -38,6 +38,6 @@ export default class UserRouter extends Router {
 	}
 
 	private isInt(n: number) {
-		return n % 1 == 0;
+		return n % 1 === 0;
 	}
 }

@@ -13,8 +13,8 @@ export default class FakeUserLayer extends UserLayer {
     }
 
     public async subscribe(subscriptionBody: SubscriptionBody) {
-        let userModel = await this.userModel.getByID(subscriptionBody.userID);
-        userModel.followerHook = new TwitchWebhook(subscriptionBody.callbackURL, subscriptionBody.topic, null);
+        const userModel = await this.userModel.getByID(subscriptionBody.userID);
+        userModel.followerHook = new TwitchWebhook(subscriptionBody.callbackURL, "topic", null);
         return userModel;
     }
 }

@@ -1,75 +1,62 @@
 import { use, expect } from 'chai';
 import 'mocha';
 import BodyValidator from "../../src/validators/BodyValidator"
-import Validatable from "../../src/validators/Validatable";
 import { mockRes } from 'sinon-express-mock';
 import * as sinonChai from 'sinon-chai'
 import ErrorMessage from '../../src/messages/ErrorMessage';
+import TestBody from './TestBody';
 
 use(sinonChai);
-
-class TestBody extends Validatable {
-	a: string;
-	b: boolean;
-	c: number
-	
-	constructor(body: any) {
-		super();
-		this.a = body.a;
-		this.b = body.b;
-		this.c = body.c;
-	}
-}
 
 describe('BodyValidator', () => {
 	describe('isValid', () => {
 		it('Should fail because body has undefined values', () => {
-			let validator = new BodyValidator<TestBody>();
+			const validator = new BodyValidator<TestBody>();
 			
-			let body = new TestBody({});
+			const body = new TestBody({});
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because body has null values', () => {
-			let validator = new BodyValidator<TestBody>();
+			const validator = new BodyValidator<TestBody>();
 			
-			let body = new TestBody({
+			const body = new TestBody({
 				a: null,
 				b: null,
 				c: null
 			});
 
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because body was casted', () => {
-			let validator = new BodyValidator<TestBody>();
+			const validator = new BodyValidator<TestBody>();
 			
-			let body = {} as TestBody
+			const body = {} as TestBody
 			
-			expect(validator.isValid(body)).to.be.false; 
+			expect(validator.isValid(body)).to.equal(false); 
 		});
 		
 		it('Should return true because body is valid', () => {
-			let validator = new BodyValidator<TestBody>();
+			const validator = new BodyValidator<TestBody>();
 			
-			let body : TestBody = new TestBody({
+			const body : TestBody = new TestBody({
 				a: "a",
 				b: true,
 				c: 1
 			});
 			
-			expect(validator.isValid(body)).to.be.true; 
+			expect(validator.isValid(body)).to.equal(true); 
 		});
 	});
 
 	describe('sendError', () => {
 		it('Should send a missing property error due to null value', () => {
-			let validator = new BodyValidator<TestBody>();
-			let response = mockRes();
+			const validator = new BodyValidator<TestBody>();
+			const response = mockRes();
 			
-			let body = new TestBody({});
+			const body = new TestBody({});
 			validator.sendError(response, body);
 
 			expect(response.json).to.have.been.calledWith(
@@ -79,10 +66,10 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should send a missing property error due to undefined value', () => {
-			let validator = new BodyValidator<TestBody>();
-			let response = mockRes();
+			const validator = new BodyValidator<TestBody>();
+			const response = mockRes();
 
-			let body = new TestBody({
+			const body = new TestBody({
 				a: null,
 				b: null,
 				c: null
@@ -96,10 +83,10 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should send a casting error message', () => {
-			let validator = new BodyValidator<TestBody>();
-			let response = mockRes();
+			const validator = new BodyValidator<TestBody>();
+			const response = mockRes();
 
-			let body = {} as TestBody
+			const body = {} as TestBody
 			validator.sendError(response, body);
 
 			expect(response.json).to.have.been.calledWith(
