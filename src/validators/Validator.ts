@@ -4,7 +4,7 @@ import StatusCodes from "../routes/StatusCodes";
 import ErrorMessage from "../messages/ErrorMessage";
 import IValidatable from "./IValidatable";
 
-export default class ObjectValidator<T extends IValidatable> implements IValidator<T> {
+export default class Validator<T extends IValidatable> implements IValidator<T> {
 	private name: string;
 
 	constructor(name: string) {

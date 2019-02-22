@@ -6,6 +6,7 @@ import ErrorMessage from "../../src/messages/ErrorMessage";
 import TestTopicRouter from "../mocks/TestTopicRouter";
 import DataMessage from '../../src/messages/DataMessage';
 import StatusCodes from '../../src/routes/StatusCodes';
+import TestBody from "../mocks/TestBody";
 
 use(sinonChai);
 
@@ -34,7 +35,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Query is missing property: 'hub.topic' it is either null or undefined")
+				new ErrorMessage("Challenge Query is missing property: 'hub.topic' it is either null or undefined")
 			);
 		});
 
@@ -57,7 +58,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Query is missing property: 'hub.mode' it is either null or undefined")
+				new ErrorMessage("Challenge Query is missing property: 'hub.mode' it is either null or undefined")
 			);
 		});
 
@@ -80,7 +81,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Query is missing property: 'hub.topic' it is either null or undefined")
+				new ErrorMessage("Challenge Query is missing property: 'hub.topic' it is either null or undefined")
 			);
 		});
 
@@ -103,7 +104,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Query is missing property: 'hub.lease_seconds' it is either null or undefined")
+				new ErrorMessage("Challenge Query is missing property: 'hub.lease_seconds' it is either null or undefined")
 			);
 		});
 
@@ -126,7 +127,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Query is missing property: 'hub.challenge' it is either null or undefined")
+				new ErrorMessage("Challenge Query is missing property: 'hub.challenge' it is either null or undefined")
 			);
 		});
 
@@ -168,7 +169,7 @@ describe('Topic Router', () => {
 
 			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Body must not be empty")
+				new ErrorMessage("Test Body has a null or undefined value on the 'a' field")
 			);
 		});
 
@@ -211,7 +212,7 @@ describe('Topic Router', () => {
 			expect(response.json).to.have.been.calledWith(
 				new DataMessage({
 					desc: `Recieved data under topic: /test`,
-					body: { a: true },
+					body: new TestBody({ a: true }),
 					processedData: true
 				})
 			);

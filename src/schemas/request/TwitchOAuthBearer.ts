@@ -1,8 +1,14 @@
 import Validatable from "../../validators/Validatable";
 import ITwitchOAuthBearer from "./ITwitchOAuthBearer";
+import IValidator from "../../validators/IValidator";
+import PartialValidator from "../../validators/PartialValidator";
 
 export default class TwitchOAuthBearer extends Validatable implements ITwitchOAuthBearer {
 	public static readonly ClientAuthFields : string[] = ["accessToken", "scope"];
+
+	public static readonly Validator : IValidator<TwitchOAuthBearer> = new PartialValidator("Access Token", [
+		"accessToken", "scope"
+	]);
 
 	public readonly error: string;
 	public readonly status: number;

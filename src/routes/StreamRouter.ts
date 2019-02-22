@@ -1,20 +1,22 @@
 import TopicRouter from "./TopicRouter";
 import { Logger } from "../config/Winston";
 import StreamBody from "../schemas/request/StreamBody";
-
-/* This is stored outside the class so the fields can be 
- * accessed by super and passed to the topic router to 
- * create the Body Validator
-*/
-const StreamBodyFields : string[] = ["data"];
+import IRequestBuilder from "../request_builder/IRequestBuilder";
 
 export default class StreamRouter extends TopicRouter<StreamBody> {	
-    constructor() {
-        super('/streams', StreamBodyFields);
+	private requestBuilder : IRequestBuilder;
+
+    constructor(requestBuilder : IRequestBuilder) {
+		super('/streams', StreamBody.Validator);
+		this.requestBuilder = requestBuilder;
     }
 
     protected async handleWebhookData(body: StreamBody): Promise<void> {
 		Logger.info(`Stream webhook recieved body: ${body}`);
-		throw new Error("Not yet implemented");
-    }
+		await this.requestBuilder.makeRequest("", {});	// put message onto the message queue
+	}
+	
+	protected getBody(body: any) : StreamBody {
+		return new StreamBody(body);
+	}
 }

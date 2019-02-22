@@ -1,7 +1,7 @@
 import ITwitchRequest from "./ITwitchRequest";
 import TwitchSubscription from "./TwitchSubscription";
 import TwitchRequestBody from "./TwitchRequestBody";
-import { RequestInit, Response } from 'node-fetch';
+import { RequestInit, Response, Headers } from 'node-fetch';
 import HTTPRequestBuilder from "../request_builder/HTTPRequestBuilder";
 import TwitchResponse from "./TwitchResponse";
 import TwitchOAuthBearer from "../schemas/request/TwitchOAuthBearer";
@@ -53,18 +53,21 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 		};
 	}
 
-	private async getHeaders(): Promise<any> {
+	private async getHeaders(): Promise<Headers> {
+		const clientID : string = process.env.TWITCH_CLIENT_ID !== undefined ?
+									process.env.TWITCH_CLIENT_ID :
+									"";
 		if (this.subscription.authorizationRequired) {
-			return {
-				"Client-ID": process.env.TWITCH_CLIENT_ID,
+			return new Headers({
+				"Client-ID": clientID,
 				"Content-Type": "application/json",
 				"Authorization": `Bearer ${await this.getOAuthToken()}`
-			};
+			});
 		} else {
-			return {
-				"Client-ID":process.env.TWITCH_CLIENT_ID,
+			return new Headers({
+				"Client-ID": clientID,
 				"Content-Type": "application/json"
-			};
+			});
 		}
 	}
 

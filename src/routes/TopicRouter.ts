@@ -4,21 +4,18 @@ import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../config/Winston";
 import IValidatable from "../validators/IValidatable";
-import PartialBodyValidator from "../validators/PartialBodyValidator";
-import QueryValidator from "../validators/QueryValidator";
+import IValidator from "../validators/IValidator";
 
 export default abstract class TopicRouter<T extends IValidatable> extends Router {
-    private challengeValidator: QueryValidator<ChallengeQuery>;
-    private hookDataValidator: PartialBodyValidator<T>;
+    private hookDataValidator: IValidator<T>;
     private topic : string;
 
-    constructor(topic: string, requiredFields: string[]) {
+    constructor(topic: string, validator: IValidator<T>) {
         super(`/topic`);
         this.topic = topic;
         this.handleChallenge = this.handleChallenge.bind(this);
         this.handleWebhookCall = this.handleWebhookCall.bind(this);
-        this.challengeValidator = new QueryValidator<ChallengeQuery>();
-        this.hookDataValidator = new PartialBodyValidator<T>(requiredFields);
+        this.hookDataValidator = validator;
     }
 
     public setup() : void {
@@ -28,11 +25,11 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
 
     public async handleChallenge(request: Request, response: Response) : Promise<void> {
 		const body : ChallengeQuery = new ChallengeQuery(request.query);
-        if (!this.challengeValidator.isValid(body)) {
+        if (!ChallengeQuery.Validator.isValid(body)) {
             Logger.error(
 				`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`
 			);
-            this.challengeValidator.sendError(response, body);
+            ChallengeQuery.Validator.sendError(response, body);
         } else {
 			response.send(body["hub.challenge"]).status(StatusCodes.OK);
 		}
@@ -40,16 +37,18 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
     
 
     public async handleWebhookCall(request: Request, response: Response) : Promise<void> {
-        const body : T = request.body as T;
+        const body : T = this.getBody(request.body);
         if (!this.hookDataValidator.isValid(body)) {
             Logger.error(
 				`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`
 			);
             this.hookDataValidator.sendError(response, body);
         } else {
-			this.processWebhook(response, body);
+			await this.processWebhook(response, body);
 		}
 	}
+
+	protected abstract getBody(body: any) : T;
 	
 	private async processWebhook(response: Response, body: T) : Promise<void> {
 		try {
@@ -62,7 +61,7 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
 			}, StatusCodes.OK);
 		} catch (error) {
 			Logger.error(error);
-			this.sendError(response, error, StatusCodes.InternalError);
+			this.sendError(response, "Failed to process webhook data", StatusCodes.InternalError);
 		}
 	}
 

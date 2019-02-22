@@ -38,7 +38,7 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 			case "streams":
 				return `https://api.twitch.tv/helix/streams?user_id=${subscription.userID}`;
 			default:
-				throw new Error(`Unknown topic: ${subscription.topic}`);
+				throw new Error(`Unknown topic: '${subscription.topic}'`);
 		}
 	}
 

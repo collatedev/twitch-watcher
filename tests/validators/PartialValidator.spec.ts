@@ -19,6 +19,13 @@ describe('PartialBodyValidator', () => {
 			expect(validator.isValid(body)).to.equal(false); 
 		});
 
+		it('Should fail because body is empty', () => {
+			const validator : TestPartialValidator<TestPartialBody> = new TestPartialValidator<TestPartialBody>(["a"]);
+			const body : TestPartialBody = {} as TestPartialBody;
+
+			expect(validator.isValid(body)).to.equal(false); 
+		});
+
 		it('Should fail because body has incorrect properties', () => {
 			const validator : TestPartialValidator<TestPartialBody> = new TestPartialValidator<TestPartialBody>(["a"]);
 			const body : TestPartialBody = Object.assign({

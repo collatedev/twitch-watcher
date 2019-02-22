@@ -5,21 +5,15 @@ import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import { Logger } from "../config/Winston";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
-import BodyValidator from "../validators/BodyValidator";
 import TwitchUser from "../schemas/user/TwitchUser";
 
 
 export default class SubscriptionRouter extends Router {
     private userLayer : UserLayer;
-    private unsubscribeBodyValidator: BodyValidator<UnsubscriptionBody>;
-    private subscribeBodyValidator: BodyValidator<SubscriptionBody>;
 
     constructor(userLayer: UserLayer) {
         super('/user/subscriptions');
         this.userLayer = userLayer;
-        
-        this.unsubscribeBodyValidator = new BodyValidator<UnsubscriptionBody>();
-        this.subscribeBodyValidator = new BodyValidator<SubscriptionBody>();
 
         this.handleSubscription = this.handleSubscription.bind(this);
         this.handleUnsubscription = this.handleUnsubscription.bind(this);
@@ -32,9 +26,9 @@ export default class SubscriptionRouter extends Router {
 
     public async handleSubscription(request: Request, response: Response) : Promise<void> {
         const body : SubscriptionBody = new SubscriptionBody(request.body);
-        if (!this.subscribeBodyValidator.isValid(body)) {
+        if (!SubscriptionBody.Validator.isValid(body)) {
             Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
-            this.subscribeBodyValidator.sendError(response, body);
+            SubscriptionBody.Validator.sendError(response, body);
         } else {
 			await this.subscribeToWebhook(response, body);
 		}
@@ -53,9 +47,9 @@ export default class SubscriptionRouter extends Router {
 
     public async handleUnsubscription(request: Request, response: Response) : Promise<void> {
         const body : SubscriptionBody = new UnsubscriptionBody(request.body);
-        if (!this.unsubscribeBodyValidator.isValid(body)) {
+        if (!UnsubscriptionBody.Validator.isValid(body)) {
             Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
-            return this.unsubscribeBodyValidator.sendError(response, body);
+            return UnsubscriptionBody.Validator.sendError(response, body);
         } else {
 			await this.unsubscribeFromWebhook(response, body);
 		}

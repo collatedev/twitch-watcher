@@ -1,11 +1,11 @@
-import * as Express from "express"
-import * as BodyParser from "body-parser"
+import * as Express from "express";
+import * as BodyParser from "body-parser";
 import IRouter from "./routes/IRouter";
 import * as morgan from "morgan";
 import {Stream, Logger} from "./config/Winston";
 
 export default class App {
-    public app: Express.Application
+    public app: Express.Application;
 
     constructor() {
         this.app = Express();

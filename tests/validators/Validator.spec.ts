@@ -1,6 +1,6 @@
 import { use, expect } from 'chai';
 import 'mocha';
-import BodyValidator from "../../src/validators/BodyValidator";
+import Validator from "../../src/validators/Validator";
 import { mockRes } from 'sinon-express-mock';
 import * as sinonChai from 'sinon-chai';
 import ErrorMessage from '../../src/messages/ErrorMessage';
@@ -9,17 +9,17 @@ import StatusCodes from '../../src/routes/StatusCodes';
 
 use(sinonChai);
 
-describe('BodyValidator', () => {
+describe('Validator', () => {
 	describe('isValid', () => {
 		it('Should fail because body has undefined values', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const body : TestBody = new TestBody({});
 
 			expect(validator.isValid(body)).to.equal(false); 
 		});
 
 		it('Should fail because body has null values', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const body : TestBody = new TestBody({
 				a: null,
 				b: null,
@@ -30,14 +30,14 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should fail because body was casted', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const body : TestBody = {} as TestBody;
 			
 			expect(validator.isValid(body)).to.equal(false); 
 		});
 		
 		it('Should return true because body is valid', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const body : TestBody = new TestBody({
 				a: "a",
 				b: true,
@@ -50,7 +50,7 @@ describe('BodyValidator', () => {
 
 	describe('sendError', () => {
 		it('Should send a missing property error due to null value', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const response : any = mockRes();
 			const body : TestBody = new TestBody({});
 			
@@ -63,7 +63,7 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should send a missing property error due to undefined value', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const response : any = mockRes();
 			const body : TestBody = new TestBody({
 				a: null,
@@ -80,7 +80,7 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should send a casting error message', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const response : any = mockRes();
 			const body : TestBody = {} as TestBody;
 			
@@ -93,7 +93,7 @@ describe('BodyValidator', () => {
 		});
 
 		it('Should throw an error because the body is valid', () => {
-			const validator : BodyValidator<TestBody> = new BodyValidator<TestBody>();
+			const validator : Validator<TestBody> = new Validator<TestBody>("Body");
 			const response : any = mockRes();
 
 			const body : TestBody = new TestBody({

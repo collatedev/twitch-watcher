@@ -5,7 +5,7 @@ import TwitchSubscription from "../../src/twitch/TwitchSubscription";
 import SubscriptionBody from "../../src/schemas/request/SubscriptionBody";
 import FakeRequestBuilder from "../mocks/FakeRequestBuilder";
 import FakeSecretGenerator from "../mocks/FakeSecretGenerator";
-import { Response } from "node-fetch";
+import { Response, Headers } from "node-fetch";
 import * as chaiAsPromised from "chai-as-promised";
 import TwitchResponse from "../../src/twitch/TwitchResponse";
 import TwitchRequestBody from "../../src/twitch/TwitchRequestBody";
@@ -74,11 +74,11 @@ describe("TwitchRequest", () => {
 			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.deep.equal(new TwitchResponse({
-				headers: {
+				headers: new Headers({
 					"Client-ID": clientID === undefined ? "" : clientID,
 					"Content-Type": "application/json",
 					"Authorization": 'Bearer asdfasdf'
-				},
+				}),
 				body: new TwitchRequestBody(subscription).getBody(),
 				method: "POST"
 			}, new Response("", {
@@ -104,10 +104,10 @@ describe("TwitchRequest", () => {
 			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.deep.equal(new TwitchResponse({
-				headers: {
+				headers: new Headers({
 					"Client-ID": clientID === undefined ? "" : clientID,
 					"Content-Type": "application/json",
-				},
+				}),
 				body: new TwitchRequestBody(subscription).getBody(),
 				method: "POST"
 			}, new Response("", {

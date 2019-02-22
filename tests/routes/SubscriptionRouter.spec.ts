@@ -38,7 +38,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body is missing property: 'callbackURL' it is either null or undefined")
+                new ErrorMessage("Subscription Body is missing property: 'callbackURL' it is either null or undefined")
             );
         });
 
@@ -60,7 +60,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body is missing property: 'callbackURL' it is either null or undefined")
+                new ErrorMessage("Subscription Body is missing property: 'callbackURL' it is either null or undefined")
             );
         });
 
@@ -82,7 +82,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body is missing property: 'userID' it is either null or undefined")
+                new ErrorMessage("Subscription Body is missing property: 'userID' it is either null or undefined")
             );
         });
 
@@ -91,7 +91,7 @@ describe('Subscription Router', () => {
             const request : any = mockReq({
                 body: {
                     callbackURL: "callbackURL",
-                    topic: "topci",
+                    topic: "topic",
                     userID: 1
                 }
             });
@@ -149,7 +149,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body is missing property: 'userID' it is either null or undefined")
+                new ErrorMessage("Unsubscription Body has a null or undefined value on the 'userID' field")
             );
         });
 
@@ -170,7 +170,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Body is missing property: 'userID' it is either null or undefined")
+                new ErrorMessage("Unsubscription Body has a null or undefined value on the 'userID' field")
             );
         });
 

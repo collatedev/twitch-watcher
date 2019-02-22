@@ -78,7 +78,8 @@
     "exclude": [
       "**/*.d.ts",
       "dist",
-      "coverage"
+	  "coverage",
+	  "tests"
     ],
     "reporter": [
       "html"
