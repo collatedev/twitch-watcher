@@ -3,10 +3,10 @@ import * as Path from "path";
 import TwitchSubscription from "./TwitchSubscription";
 import SecretGenerator from "./SecretGenerator";
 
+const SecretAlphabet : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
+
 export default class TwitchRequestBody implements ITwitchRequestBody {
-	public static SecretGenerator: SecretGenerator = new SecretGenerator(
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()"
-	);
+	public static SecretGenerator: SecretGenerator = new SecretGenerator(SecretAlphabet);
 
 	public "hub.mode": string;
 	public "hub.topic": string;
@@ -14,8 +14,9 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 	public "hub.lease_seconds": number;
 	public "hub.secret": string;
 
-	private readonly LeaseSeconds = 10 * 24 * 60 * 60; // 10 days in seconds
-	private readonly SecretSize = 16;
+	
+	private readonly LeaseSeconds : number = 864000; // 10 days in seconds
+	private readonly SecretSize : number = 16;
 	
 
 	constructor(subscription: TwitchSubscription) {
@@ -29,7 +30,7 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 	private static generateTopicURL(subscription: TwitchSubscription): string {
 		switch(subscription.topic) {
 			case "follow/new":
-				return `https://api.twitch.tv/helix/users/follows?first=1&to_id=${subscription.userID}`;;
+				return `https://api.twitch.tv/helix/users/follows?first=1&to_id=${subscription.userID}`;
 			case "follow/followed":
 				return `https://api.twitch.tv/helix/users/follows?first=1&from_id=${subscription.userID}`;
 			case "user":
@@ -41,7 +42,7 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 		}
 	}
 
-	public getBody() {
+	public getBody() : string {
 		return JSON.stringify({
 			"hub.mode": this["hub.mode"],
 			"hub.topic": this["hub.topic"],

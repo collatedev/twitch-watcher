@@ -1,8 +1,9 @@
 import Router from "./Router";
-import * as Express from "express";
+import { Response, Request } from "express";
 import UserLayer from "../layers/UserLayer";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../config/Winston";
+import TwitchUser from "../schemas/user/TwitchUser";
 
 export default class UserRouter extends Router {
 	private userLayer : UserLayer;
@@ -10,21 +11,30 @@ export default class UserRouter extends Router {
 	constructor(userLayer: UserLayer) {
 		super('/user');
 		this.userLayer = userLayer; 
-		this.getUserByID = this.getUserByID.bind(this);
+		this.handleGetUserByID = this.handleGetUserByID.bind(this);
 	}
 
 	public setup() : void {
-		this.router.get('/:userID', this.getUserByID);
+		this.router.get('/:userID', this.handleGetUserByID);
 	}
 
-	public async getUserByID(request: Express.Request, response: Express.Response) {
-		const userID = parseFloat(request.params.userID);
+	public async handleGetUserByID(request: Request, response: Response) : Promise<void> {
+		const userID : number = parseFloat(request.params.userID);
 		if (!this.isValidID(userID)) {
-			Logger.error("")
-			this.sendError(response, `The Twitch User ID must be a positive integer value, instead received '${userID}'`, StatusCodes.BadRequest);
+			Logger.error(`Illegal userID: '${userID}'`);
+			this.sendError(
+				response, 
+				`The Twitch User ID must be a positive integer value, instead received '${userID}'`, 
+				StatusCodes.BadRequest
+			);
+		} else {
+			await this.getUserByID(response, userID);
 		}
+	}
+
+	private async getUserByID(response: Response, userID: number) : Promise<void> {
 		try {
-			const user = await this.userLayer.getUserInfo(userID);
+			const user : TwitchUser = await this.userLayer.getUserInfo(userID);
 			Logger.info(`Successfully got user: ${JSON.stringify(user)}`);
 			this.sendData(response, user, StatusCodes.OK);
 		} catch (error) {
@@ -33,11 +43,11 @@ export default class UserRouter extends Router {
 		}
 	}
 	
-	private isValidID(userID: number) {
+	private isValidID(userID: number) : boolean {
 		return !isNaN(userID) && this.isInt(userID) && userID > -1;
 	}
 
-	private isInt(n: number) {
+	private isInt(n: number) : boolean {
 		return n % 1 === 0;
 	}
 }

@@ -1,28 +1,29 @@
 import StreamRouter from '../../src/routes/StreamRouter';
 import { use, expect } from 'chai';
 import 'mocha';
-import { mockReq, mockRes } from 'sinon-express-mock'
-import * as sinonChai from 'sinon-chai'
+import { mockReq, mockRes } from 'sinon-express-mock';
+import * as sinonChai from 'sinon-chai';
 import ErrorMessage from '../../src/messages/ErrorMessage';
+import StatusCodes from '../../src/routes/StatusCodes';
 
 use(sinonChai);
 
 describe('Stream Router', () => {
 	describe('setup', () => {
-		const router = new StreamRouter();
+		const router : StreamRouter = new StreamRouter();
 
 		try {
 			router.setup();
 		} catch (error) {
 			throw error;
 		}
-	})
+	});
 
     describe('handleChallenge', () => {
 		it('Should fail', async () => {
-			const router = new StreamRouter();
-			const request = mockReq();
-			const response = mockRes();
+			const router : StreamRouter = new StreamRouter();
+			const request : any = mockReq();
+			const response : any = mockRes();
 
 			try {
 				await router.handleChallenge(request, response);
@@ -30,7 +31,7 @@ describe('Stream Router', () => {
 				throw error;
 			}
 
-			expect(response.status).to.have.been.calledWith(400);
+			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
 			expect(response.json).to.have.been.calledWith(
 				new ErrorMessage("Query is missing property: 'hub.topic' it is either null or undefined")
 			);
@@ -39,13 +40,13 @@ describe('Stream Router', () => {
 
     describe('handleWebhookCall', () => {
 		it('Should fail', async () => {
-			const router = new StreamRouter();
-			const request = mockReq({
+			const router : StreamRouter = new StreamRouter();
+			const request : any = mockReq({
 				body: {
 					data: []
 				}
 			});
-			const response = mockRes();
+			const response : any = mockRes();
 
 			try {
 				await router.handleWebhookCall(request, response);
@@ -53,5 +54,5 @@ describe('Stream Router', () => {
 				throw error;
 			}
 		});
-    })
+    });
 });

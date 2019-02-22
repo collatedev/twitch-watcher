@@ -13,6 +13,7 @@ export default class TwitchSubscription {
 	public scope: string;
 
 	constructor(body: ITwitchBody, topic: string) {
+		this.mode = "";
 		this.topic = topic;
 		this.userID = body.userID;
 		this.callbackURL = body.callbackURL;

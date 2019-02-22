@@ -9,8 +9,12 @@
         "noImplicitAny": true,
         "strictFunctionTypes": true,
         "noImplicitThis": true,
-        "alwaysStrict": true,
-        "allowSyntheticDefaultImports": true
+		"alwaysStrict": true,
+		"noImplicitReturns": true,
+		"allowSyntheticDefaultImports": true,
+		"noUnusedLocals": true,
+		"strictPropertyInitialization": true,
+		"strictNullChecks": true
     },
     "include": [
         "src/**/*"

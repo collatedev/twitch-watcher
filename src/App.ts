@@ -11,7 +11,7 @@ export default class App {
         this.app = Express();
     }
 
-    public initialize() {
+    public initialize() : void {
         this.app.use(BodyParser.json());
         this.app.use(BodyParser.urlencoded({
             extended: false
@@ -20,13 +20,13 @@ export default class App {
         this.app.use(morgan('combined', { stream: Stream }));
     }
 
-    public start(port: number) {
-        this.app.listen(port, () => {
+    public start(port: number) : void {
+        this.app.listen(port, () : void => {
             Logger.info(`Server is listening on port ${port}`);
         });
     }
 
-    public addRouter(router: IRouter) {
+    public addRouter(router: IRouter) : void {
         router.setup();
         this.app.use(router.getPath(), router.getRouter());
     }

@@ -1,6 +1,9 @@
 import IRequestBuilder from "../../src/request_builder/IRequestBuilder";
 import { RequestInit, Response } from "node-fetch";
 
+type RequestResolver = (response: Response | undefined) => void;
+type RequestRejector = (error: Error) => void;
+
 export default class FakeRequestBuilder implements IRequestBuilder {
 	private responses: Response[];
 
@@ -8,17 +11,19 @@ export default class FakeRequestBuilder implements IRequestBuilder {
 		this.responses = [];
 	}
 
-	public queueResponse(response: Response) {
+	public queueResponse(response: Response) : void {
 		this.responses.push(response);
 	}
 
 	public async makeRequest(url: string, options: RequestInit): Promise<Response> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve: RequestResolver, reject: RequestRejector): void => {
 			if (this.responses.length === 0) {
 				return reject(new Error('Request Failed'));
+			} else if (this.responses[0] === undefined) {
+					return reject(new Error('Request Failed'));
 			} else {
 				return resolve(this.responses.shift());
 			}
-		}) 
+		});
 	}
 }

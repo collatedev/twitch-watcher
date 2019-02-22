@@ -1,7 +1,7 @@
-import Message from "./Message"
+import Message from "./Message";
 
 export default class DataMessage extends Message {
-	private data: object;
+	public readonly data : object;
 
 	constructor(data: object) {
 		super("Success", true);

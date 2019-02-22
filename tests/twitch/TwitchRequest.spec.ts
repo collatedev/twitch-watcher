@@ -1,5 +1,5 @@
 import { expect, should, use } from "chai";
-import "mocha"
+import "mocha";
 import TestTwitchRequest from "../mocks/TestTwitchRequest";
 import TwitchSubscription from "../../src/twitch/TwitchSubscription";
 import SubscriptionBody from "../../src/schemas/request/SubscriptionBody";
@@ -16,15 +16,15 @@ use(chaiAsPromised);
 describe("TwitchRequest", () => {
 	describe('send', () => {
 		it('Should fail to get OAuth token for the request', async () => {
-			const body = new SubscriptionBody({
+			const body : SubscriptionBody = new SubscriptionBody({
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription = new TwitchSubscription(body, "user");
-			const builder = new FakeRequestBuilder();
-			const request = new TestTwitchRequest(subscription, builder);
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const builder : FakeRequestBuilder = new FakeRequestBuilder();
+			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			
-			return expect(request.send().catch((error) => {
+			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.be.rejectedWith(
 				"Request Failed"
@@ -32,13 +32,13 @@ describe("TwitchRequest", () => {
 		});
 
 		it('Should fail to get OAuth token for the request due to error with request', async () => {
-			const body = new SubscriptionBody({
+			const body : SubscriptionBody = new SubscriptionBody({
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription = new TwitchSubscription(body, "user");
-			const builder = new FakeRequestBuilder();
-			const request = new TestTwitchRequest(subscription, builder);
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const builder : FakeRequestBuilder = new FakeRequestBuilder();
+			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 
 			builder.queueResponse(new Response(JSON.stringify({
 				error: "error",
@@ -48,7 +48,7 @@ describe("TwitchRequest", () => {
 				status: 400
 			}));
 			
-			return expect(request.send().catch((error) => {
+			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.be.rejectedWith(
 				"[error]: message"
@@ -56,25 +56,26 @@ describe("TwitchRequest", () => {
 		});
 
 		it('Should successfully send authorized request', async () => {
-			const body = new SubscriptionBody({
+			const body : SubscriptionBody = new SubscriptionBody({
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription = new TwitchSubscription(body, "user");
-			const builder = new FakeRequestBuilder();
-			const request = new TestTwitchRequest(subscription, builder);
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const builder : FakeRequestBuilder = new FakeRequestBuilder();
+			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 			queueBearerResponse(builder);
 			builder.queueResponse(new Response("", {
 				status: 202
-			}))
+			}));
 			
-			return expect(request.send().catch((error) => {
+			const clientID : string | undefined = process.env.TWITCH_CLIENT_ID;
+			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.deep.equal(new TwitchResponse({
 				headers: {
-					"Client-ID": process.env.TWITCH_CLIENT_ID,
+					"Client-ID": clientID === undefined ? "" : clientID,
 					"Content-Type": "application/json",
 					"Authorization": 'Bearer asdfasdf'
 				},
@@ -83,27 +84,28 @@ describe("TwitchRequest", () => {
 			}, new Response("", {
 				status: 202
 			})));
-		})
+		});
 
 		it('Should successfully send unauthorized request', async () => {
-			const body = new SubscriptionBody({
+			const body : SubscriptionBody  = new SubscriptionBody({
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription = new TwitchSubscription(body, "streams");
-			const builder = new FakeRequestBuilder();
-			const request = new TestTwitchRequest(subscription, builder);
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "streams");
+			const builder : FakeRequestBuilder = new FakeRequestBuilder();
+			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 			builder.queueResponse(new Response("", {
 				status: 202
-			}))
+			}));
 			
-			return expect(request.send().catch((error) => {
+			const clientID : string | undefined = process.env.TWITCH_CLIENT_ID;
+			return expect(request.send().catch((error : Error) => {
 				throw error;
 			})).to.eventually.deep.equal(new TwitchResponse({
 				headers: {
-					"Client-ID": process.env.TWITCH_CLIENT_ID,
+					"Client-ID": clientID === undefined ? "" : clientID,
 					"Content-Type": "application/json",
 				},
 				body: new TwitchRequestBody(subscription).getBody(),
@@ -111,11 +113,11 @@ describe("TwitchRequest", () => {
 			}, new Response("", {
 				status: 202
 			})));
-		})
+		});
 	});
 });
 
-function queueBearerResponse(builder: FakeRequestBuilder) {
+function queueBearerResponse(builder: FakeRequestBuilder) : void {
 	builder.queueResponse(new Response(getAuthorizationBearer(), {
 		status: 200
 	}));

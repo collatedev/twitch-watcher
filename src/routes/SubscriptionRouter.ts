@@ -6,6 +6,7 @@ import { Logger } from "../config/Winston";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 import BodyValidator from "../validators/BodyValidator";
+import TwitchUser from "../schemas/user/TwitchUser";
 
 
 export default class SubscriptionRouter extends Router {
@@ -29,35 +30,45 @@ export default class SubscriptionRouter extends Router {
         this.router.post('/unsubscribe', this.handleUnsubscription);
     }
 
-    public async handleSubscription(request: Request, response: Response) {
-        const body = new SubscriptionBody(request.body);
+    public async handleSubscription(request: Request, response: Response) : Promise<void> {
+        const body : SubscriptionBody = new SubscriptionBody(request.body);
         if (!this.subscribeBodyValidator.isValid(body)) {
             Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
-            return this.subscribeBodyValidator.sendError(response, body);
-        }
-        try {
-            const user = await this.userLayer.subscribe(body);
+            this.subscribeBodyValidator.sendError(response, body);
+        } else {
+			await this.subscribeToWebhook(response, body);
+		}
+	}
+	
+	private async subscribeToWebhook(response: Response, body: SubscriptionBody) : Promise<void> {
+		try {
+            const user : TwitchUser = await this.userLayer.subscribe(body);
             Logger.info(`successfully subscribed user (id=${body.userID}) to webhooks`);
-            return this.sendData(response, user, StatusCodes.OK);
+            this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
-            Logger.error(error)
-            return this.sendError(response, "Failed to subscribe user to webhook", StatusCodes.InternalError);
+            Logger.error(error);
+            this.sendError(response, "Failed to subscribe user to webhook", StatusCodes.InternalError);
         }
-    }
+	}
 
-    public async handleUnsubscription(request: Request, response: Response) {
-        const body = new UnsubscriptionBody(request.body);
+    public async handleUnsubscription(request: Request, response: Response) : Promise<void> {
+        const body : SubscriptionBody = new UnsubscriptionBody(request.body);
         if (!this.unsubscribeBodyValidator.isValid(body)) {
             Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
             return this.unsubscribeBodyValidator.sendError(response, body);
-        }
-        try {
-            const user = await this.userLayer.unsubscribe(body);
+        } else {
+			await this.unsubscribeFromWebhook(response, body);
+		}
+	}
+	
+	private async unsubscribeFromWebhook(response: Response, body: SubscriptionBody) : Promise<void> {
+		try {
+            const user : TwitchUser = await this.userLayer.unsubscribe(body);
             Logger.info(`successfully unsubscribed user (id=${body.userID}) from webhooks`);
-            return this.sendData(response, user, StatusCodes.OK);
+            this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
-            Logger.error(error)
-            return this.sendError(response, "Failed to unsubscribe user from webhook", StatusCodes.InternalError);
+            Logger.error(error);
+            this.sendError(response, "Failed to unsubscribe user from webhook", StatusCodes.InternalError);
         }
-    }
+	}
 }

@@ -1,10 +1,14 @@
-import * as path from 'path'
+import * as path from 'path';
 import * as Winston from "winston";
 import { StreamOptions } from "morgan";
 import { TransformableInfo, Format } from 'logform';
 
+type ErrorReplacer = (error: Error) => Format;
+type Replacer = (key: string, value: any) => any;
+
+
 // define the custom settings for each transport (file, console)
-const options = {
+const options : any = {
 	file: {
 		level: 'info',
 		filename: path.resolve(__dirname, '..', '..', 'logs', 'app.log'),
@@ -32,7 +36,7 @@ const options = {
 };
 
 // instantiate a new Winston Logger with the settings defined above
-const Logger = Winston.createLogger({
+const Logger : Winston.Logger = Winston.createLogger({
 	transports: process.env.NODE_ENV !== 'test' ? [
 		new Winston.transports.File(options.file),
 		new Winston.transports.Console(options.console)
@@ -52,32 +56,48 @@ function getFormat() : Format {
 	}
 }
 
-function prodFormat() {
-	const replaceError = (error: Error) => { 
-		return {
+function prodFormat() : Format {
+	const replaceError : ErrorReplacer = (error: Error): Format => { 
+		return new Format({
 			label: error.name, 
 			level: "error", 
 			message: error.message, 
 			stack: error.stack
-		};
-	}
-	const replacer = (key: string, value: any) => value instanceof Error ? replaceError(value) : value;
-	return Winston.format.combine(Winston.format.label({ label: 'ssr server log' }), Winston.format.json({ replacer }));
+		});
+	};
+	const replacer : Replacer = (key: string, value: any) : any => value instanceof Error ? 
+		replaceError(value) : 
+		value;
+	return Winston.format.combine(
+				Winston.format.label({ label: 'ssr server log' }), 
+				Winston.format.json({ replacer })
+			);
 }
 
-function devFormat() {
-	const formatMessage = (info : TransformableInfo) => `${info.level} ${info.message}`;
-	const formatError = (info : TransformableInfo) => `${info.level} ${info.message}\n\n${info.stack}\n`;
-	const format = (info : TransformableInfo) => info instanceof Error ? formatError(info) : formatMessage(info);
-	return Winston.format.combine(Winston.format.colorize(), Winston.format.printf(format))
+type DevMessageFormater = (info: TransformableInfo) => string;
+
+function devFormat() : Format {
+	const formatMessage : DevMessageFormater = (info : TransformableInfo) : string => {
+		return `${info.level} ${info.message}`;
+	};
+	const formatError : DevMessageFormater = (info : TransformableInfo) : string => {
+		return `${info.level} ${info.message}\n\n${info.stack}\n`;
+	};
+	const format : DevMessageFormater = (info : TransformableInfo): string => {
+		return info instanceof Error ? formatError(info) : formatMessage(info);
+	};
+	return Winston.format.combine(
+				Winston.format.colorize(), 
+				Winston.format.printf(format)
+			);
 }
 
 // create a stream object with a 'write' function that will be used by `morgan`
 const Stream : StreamOptions = {
-	write: (message: string) => {
+	write: (message: string): void => {
 		// use the 'info' log level so the output will be picked up by both transports (file and console)
 		Logger.info(message);
 	},
 };
 
-export { Stream, Logger }
+export { Stream, Logger };

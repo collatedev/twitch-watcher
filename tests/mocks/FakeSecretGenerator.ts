@@ -8,7 +8,7 @@ export default class FakeSecretGenerator extends SecretGenerator {
 		this.secret = secret;
 	}
 
-	public generateSecret(length: number) {
+	public generateSecret(length: number) : string {
 		return this.secret;
 	}
 }

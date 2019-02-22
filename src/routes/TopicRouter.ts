@@ -1,5 +1,5 @@
-import Router from "./Router"
-import { Request, Response } from "express"
+import Router from "./Router";
+import { Request, Response } from "express";
 import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../config/Winston";
@@ -21,44 +21,50 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
         this.hookDataValidator = new PartialBodyValidator<T>(requiredFields);
     }
 
-    public setup() {
+    public setup() : void {
         this.router.get(this.topic, this.handleChallenge);
         this.router.post(this.topic, this.handleWebhookCall);
     }
 
-    public async handleChallenge(request: Request, response: Response) {
+    public async handleChallenge(request: Request, response: Response) : Promise<void> {
 		const body : ChallengeQuery = new ChallengeQuery(request.query);
         if (!this.challengeValidator.isValid(body)) {
-            Logger.error(`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`);
-            return this.challengeValidator.sendError(response, body);
+            Logger.error(
+				`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`
+			);
+            this.challengeValidator.sendError(response, body);
         } else {
-			return response.send(body["hub.challenge"]).status(StatusCodes.OK);
+			response.send(body["hub.challenge"]).status(StatusCodes.OK);
 		}
 	}
     
 
-    public async handleWebhookCall(request: Request, response: Response) {
+    public async handleWebhookCall(request: Request, response: Response) : Promise<void> {
         const body : T = request.body as T;
         if (!this.hookDataValidator.isValid(body)) {
-            Logger.error(`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`);
-            return this.hookDataValidator.sendError(response, body);
-        }
-        
-        let processedData = true;
-        try {
-            await this.handleWebhookData(body);
-        } catch (error) {
-            Logger.error(error);
-            processedData = false;
-        }
-
-        const status = processedData ? StatusCodes.OK : StatusCodes.InternalError;
-        this.sendData(response, {
-            desc: `Recieved data under topic: ${this.topic}`,
-            body,
-            processedData,
-        }, status);
-    }
+            Logger.error(
+				`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`
+			);
+            this.hookDataValidator.sendError(response, body);
+        } else {
+			this.processWebhook(response, body);
+		}
+	}
+	
+	private async processWebhook(response: Response, body: T) : Promise<void> {
+		try {
+			await this.handleWebhookData(body);
+			Logger.info(`Successfuly processed webhook at topic: '${this.topic}'`);
+			this.sendData(response, {
+				desc: `Recieved data under topic: ${this.topic}`,
+				body,
+				processedData: true,
+			}, StatusCodes.OK);
+		} catch (error) {
+			Logger.error(error);
+			this.sendError(response, error, StatusCodes.InternalError);
+		}
+	}
 
     protected abstract async handleWebhookData(body: T): Promise<void>;
 }

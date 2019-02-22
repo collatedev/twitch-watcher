@@ -5,10 +5,11 @@
   "main": "./dist/server.js",
   "scripts": {
     "start": "npm run build && node dist/Server.js 8080",
-    "build": "rm -rf ./dist && tsc ./src/Server.ts --outDir ./dist",
-    "test": "NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
-    "coverage": "NODE_ENV=test nyc mocha -r ts-node/register tests/**/*.spec.ts && open coverage/index.html && rm ./logs/testing.log",
-    "test-verbose": "mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
+    "build": "npm run lint && rm -rf ./dist && tsc ./src/Server.ts --outDir ./dist",
+	"test": "npm run lint && NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
+	"lint": "tslint src/**/*.ts && tslint tests/**/*.ts",
+    "coverage": "npm run lint && NODE_ENV=test nyc mocha -r ts-node/register tests/**/*.spec.ts && open coverage/index.html && rm ./logs/testing.log",
+    "test-verbose": "npm run lint && mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
     "docker-build": "docker build -t collate/twitch-watcher .",
     "docker-run": "npm run docker-build && docker run -d -p 8000:8080 -v ${pwd}:/app collate/twitch-watcher",
     "webhook-local": "ngrok http 8080",
@@ -66,6 +67,7 @@
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^8.0.1",
+    "tslint-whitespace-before-colon": "^0.2.0",
     "typescript": "^3.3.3"
   },
   "nyc": {

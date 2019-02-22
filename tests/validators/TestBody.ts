@@ -3,7 +3,7 @@ import Validatable from "../../src/validators/Validatable";
 export default class TestBody extends Validatable {
 	public a: string;
 	public b: boolean;
-	public c: number
+	public c: number;
 	
 	constructor(body: any) {
 		super();

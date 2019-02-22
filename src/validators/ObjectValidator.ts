@@ -3,7 +3,6 @@ import { Response } from "express";
 import StatusCodes from "../routes/StatusCodes";
 import ErrorMessage from "../messages/ErrorMessage";
 import IValidatable from "./IValidatable";
-import debug from "debug";
 
 export default class ObjectValidator<T extends IValidatable> implements IValidator<T> {
 	private name: string;
@@ -17,7 +16,7 @@ export default class ObjectValidator<T extends IValidatable> implements IValidat
 			return false;
 		}
 		
-		const values = Object.values(body);
+		const values : any[] = Object.values(body);
 		for (const value of values) {
 			if (value === null || value === undefined) {
 				return false;
@@ -26,9 +25,10 @@ export default class ObjectValidator<T extends IValidatable> implements IValidat
 		return true;
 	}
 
-	private wasObjectCasted(body: T) {
+	private wasObjectCasted(body: T) : boolean {
 		try {
-			// this will fail if an object was casted to this type with out the method
+			// this will fail if an object was casted to this 
+			// type because properties method will be undefined
 			body.getProperties();
 			return false;
 		} catch (error) {
@@ -38,7 +38,7 @@ export default class ObjectValidator<T extends IValidatable> implements IValidat
 	
 	public sendError(response: Response, body: T): void {
 		if (this.wasObjectCasted(body)) {
-			const error = new ErrorMessage(
+			const error : ErrorMessage = new ErrorMessage(
 				`Can not handle casted ${this.name}s. Check your route for ${this.name} casting`
 			);
 			response.json(error).status(StatusCodes.InternalError);
@@ -48,13 +48,13 @@ export default class ObjectValidator<T extends IValidatable> implements IValidat
 	}
 
 	private getErrorMessage(body: T): ErrorMessage {
-		const values = Object.values(body);
-		const keys = Object.keys(body);
-		for (let i = 0; i < values.length; i++) {
+		const values : any[] = Object.values(body);
+		const keys : string[] = Object.keys(body);
+		for (let i : number = 0; i < values.length; i++) {
 			if (values[i] === null || values[i] === undefined) {
 				return new ErrorMessage(`${this.name} is missing property: '${keys[i]}' it is either null or undefined`);
 			}
 		}
-		return new ErrorMessage(`Should never reach this error message because the ${this.name} is valid.`);
+		throw new Error(`Should never reach this error message because the ${this.name} is valid.`);
     }
 }
