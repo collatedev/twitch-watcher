@@ -6,10 +6,10 @@
   "scripts": {
     "start": "npm run build && node dist/Server.js 8080",
     "build": "npm run lint && rm -rf ./dist && tsc ./src/Server.ts --outDir ./dist",
-	"test": "npm run lint && NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
-	"lint": "tslint src/**/*.ts && tslint tests/**/*.ts",
+    "test": "npm run lint && NODE_ENV=test mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
+    "lint": "tslint src/**/*.ts && tslint tests/**/*.ts",
     "coverage": "npm run lint && NODE_ENV=test nyc mocha -r ts-node/register tests/**/*.spec.ts && open coverage/index.html && rm ./logs/testing.log",
-    "test-verbose": "npm run lint && mocha -r ts-node/register tests/**/*.spec.ts && rm ./logs/testing.log",
+    "test-verbose": "npm run lint && mocha -r ts-node/register tests/**/*.spec.ts",
     "docker-build": "docker build -t collate/twitch-watcher .",
     "docker-run": "npm run docker-build && docker run -d -p 8000:8080 -v ${pwd}:/app collate/twitch-watcher",
     "webhook-local": "ngrok http 8080",
@@ -59,6 +59,7 @@
     "chai": "^4.2.0",
     "husky": "^1.3.1",
     "mocha": "^5.2.0",
+    "ngrok": "^3.1.1",
     "nyc": "^13.3.0",
     "sinon": "^7.2.3",
     "sinon-express-mock": "^2.1.0",
@@ -78,8 +79,8 @@
     "exclude": [
       "**/*.d.ts",
       "dist",
-	  "coverage",
-	  "tests"
+      "coverage",
+      "tests"
     ],
     "reporter": [
       "html"
