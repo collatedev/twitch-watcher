@@ -16,7 +16,7 @@ export default class TwitchSubscription {
 		this.mode = "";
 		this.topic = topic;
 		this.userID = body.userID;
-		this.callbackURL = body.callbackURL;
+		this.callbackURL = "https://localhost:8080/api/v1/topic/";
 		this.authorizationRequired = this.AuthorizedTopics.hasOwnProperty(topic);
 		this.scope = this.authorizationRequired ? 
 			this.AuthorizedTopics[topic].join(" ").trim() :

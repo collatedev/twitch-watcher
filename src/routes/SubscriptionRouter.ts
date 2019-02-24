@@ -46,7 +46,7 @@ export default class SubscriptionRouter extends Router {
 	}
 
     public async handleUnsubscription(request: Request, response: Response) : Promise<void> {
-        const body : SubscriptionBody = new UnsubscriptionBody(request.body);
+        const body : UnsubscriptionBody = new UnsubscriptionBody(request.body);
         if (!UnsubscriptionBody.Validator.isValid(body)) {
             Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
             return UnsubscriptionBody.Validator.sendError(response, body);

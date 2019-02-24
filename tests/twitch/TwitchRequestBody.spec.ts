@@ -6,7 +6,6 @@ import TwitchSubscription from "../../src/twitch/TwitchSubscription";
 describe("TwitchRequestBody", () => {
 	it("Should be legally constructed", () => {
 		const body : TwitchRequestBody = new TwitchRequestBody(new TwitchSubscription({
-			callbackURL: "url",
 			userID: 1
 		}, "streams"));
 
@@ -16,7 +15,6 @@ describe("TwitchRequestBody", () => {
 	it("Should be illegally constructed", () => {
 		function createRequestBody() : TwitchRequestBody {
 			return new TwitchRequestBody(new TwitchSubscription({
-				callbackURL: "url",
 				userID: 1
 			}, "illegal"));
 		}

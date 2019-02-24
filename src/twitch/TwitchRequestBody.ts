@@ -23,7 +23,7 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 		this["hub.mode"] = subscription.mode;
 		this["hub.lease_seconds"] = this.LeaseSeconds;
 		this["hub.secret"] = TwitchRequestBody.SecretGenerator.generateSecret(this.SecretSize);
-		this["hub.callback"] = Path.join(subscription.callbackURL, subscription.topic);
+		this["hub.callback"] = Path.join(subscription.callbackURL, subscription.topic).replace(':', ':/');
 		this["hub.topic"] = TwitchRequestBody.generateTopicURL(subscription);
 	}
 

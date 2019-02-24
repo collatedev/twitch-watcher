@@ -15,7 +15,7 @@ export default class FakeUserLayer extends UserLayer {
 
     public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
         const userModel : TwitchUser = await this.userModel.getByID(subscriptionBody.userID);
-        userModel.followerHook = new TwitchWebhook(subscriptionBody.callbackURL, "topic", null);
+        userModel.followerHook = new TwitchWebhook("callbackURL", "topic", null);
         return userModel;
     }
 }

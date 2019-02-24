@@ -7,12 +7,10 @@ import Validator from "../../validators/Validator";
 export default class SubscriptionBody extends Validate implements ISubscriptionBody, ITwitchBody {
 	public static readonly Validator : IValidator<SubscriptionBody> = new Validator("Subscription Body");
 
-	public readonly callbackURL: string;
 	public readonly userID: number;
 
 	constructor(body: any) {
 		super();
-		this.callbackURL = body.callbackURL;
 		this.userID = body.userID;
 	}
 }

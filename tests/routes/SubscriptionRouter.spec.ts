@@ -38,29 +38,7 @@ describe('Subscription Router', () => {
 
             expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
             expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Subscription Body is missing property: 'callbackURL' it is either null or undefined")
-            );
-        });
-
-        it(`Should fail because the body does not contain a callback URL`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                body: {
-                    topic: "",
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
-
-            try {
-				await router.handleSubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Subscription Body is missing property: 'callbackURL' it is either null or undefined")
+                new ErrorMessage("Subscription Body is missing property: 'userID' it is either null or undefined")
             );
         });
 

@@ -10,11 +10,9 @@ export default class UnsubscriptionBody extends Validatable implements IUnsubscr
 	]);
 
 	public readonly userID: number;
-	public readonly callbackURL: string;
 
 	constructor(body: any) {
 		super();
 		this.userID = body.userID;
-		this.callbackURL = "";
 	}
 }
