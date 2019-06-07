@@ -54,9 +54,7 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	}
 
 	private async getHeaders(): Promise<Headers> {
-		const clientID : string = process.env.TWITCH_CLIENT_ID !== undefined ?
-									process.env.TWITCH_CLIENT_ID :
-									"";
+		const clientID : string = this.getClientID();
 		if (this.subscription.authorizationRequired) {
 			return new Headers({
 				"Client-ID": clientID,
@@ -71,6 +69,12 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 		}
 	}
 
+	private getClientID() : string {
+		return process.env.TWITCH_CLIENT_ID !== undefined ?
+				process.env.TWITCH_CLIENT_ID :
+				"";
+	}
+
 	private async getOAuthToken(): Promise<string> {
 		try {
 			return await this.getAccessToken();
@@ -80,15 +84,21 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	}
 
 	private async getAccessToken() : Promise<string> {
-		const url : string = `https://id.twitch.tv/oauth2/token?client_id=` +
-			`${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}` +
-			`&grant_type=client_credentials&scope=${this.subscription.scope}`;
-		const response : Response = await this.requestBuilder.makeRequest(url, { method: "POST" });
+		const response : Response = await this.requestBuilder.makeRequest(
+			this.getAccessTokenRequestURL(), 
+			{ method: "POST" }
+		);
 		const bearer : TwitchOAuthBearer = new TwitchOAuthBearer(await response.json());
 		if (this.tokenValidator.isValid(bearer)) {
 			return bearer.accessToken;
 		} else {
 			throw new Error(`[${bearer.error}]: ${bearer.message}`);
 		}
+	}
+
+	private getAccessTokenRequestURL() : string {
+		return `https://id.twitch.tv/oauth2/token?client_id=` +
+			`${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}` +
+			`&grant_type=client_credentials&scope=${this.subscription.scope}`;
 	}
 }

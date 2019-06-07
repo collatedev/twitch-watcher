@@ -1,9 +1,8 @@
 import ITwitchBody from "../schemas/request/ITwitchBody";
+import AuthorizedTopic from "./AuthorizedTopic";
 
 export default class TwitchSubscription {
-	private readonly AuthorizedTopics: { [id: string]: string[] } = {
-		"user": ["user:read:email"]
-	};
+	private readonly CallbackURL: string = "https://localhost:8080/api/v1/topic/";
 
 	public mode: string;
 	public userID: number;
@@ -16,10 +15,8 @@ export default class TwitchSubscription {
 		this.mode = "";
 		this.topic = topic;
 		this.userID = body.userID;
-		this.callbackURL = "https://localhost:8080/api/v1/topic/";
-		this.authorizationRequired = this.AuthorizedTopics.hasOwnProperty(topic);
-		this.scope = this.authorizationRequired ? 
-			this.AuthorizedTopics[topic].join(" ").trim() :
-			"";
+		this.callbackURL = this.CallbackURL;
+		this.authorizationRequired = AuthorizedTopic.isAuthorizedTopic(topic);
+		this.scope = AuthorizedTopic.scope(topic);
 	}
 }
