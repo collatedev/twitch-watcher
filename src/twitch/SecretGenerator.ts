@@ -1,4 +1,6 @@
 export default class SecretGenerator {
+	public static DefaultAlphabet: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
+
 	private alphabet: string;
 
 	constructor(alphabet: string) {

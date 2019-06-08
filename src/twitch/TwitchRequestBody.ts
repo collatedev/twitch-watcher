@@ -3,10 +3,8 @@ import * as Path from "path";
 import TwitchSubscription from "./TwitchSubscription";
 import SecretGenerator from "./SecretGenerator";
 
-const SecretAlphabet : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
-
 export default class TwitchRequestBody implements ITwitchRequestBody {
-	public static SecretGenerator: SecretGenerator = new SecretGenerator(SecretAlphabet);
+	public static SecretGenerator: SecretGenerator = new SecretGenerator(SecretGenerator.DefaultAlphabet);
 
 	public "hub.mode": string;
 	public "hub.topic": string;
