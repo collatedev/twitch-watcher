@@ -2,7 +2,7 @@ import Router from "./Router";
 import { Response, Request } from "express";
 import UserLayer from "../layers/UserLayer";
 import StatusCodes from "./StatusCodes";
-import { Logger } from "../config/Winston";
+import { Logger } from "../logging/Winston";
 import TwitchUser from "../schemas/user/TwitchUser";
 
 export default class UserRouter extends Router {

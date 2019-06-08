@@ -2,7 +2,7 @@ import Router from "./Router";
 import { Request, Response } from "express";
 import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
-import { Logger } from "../config/Winston";
+import { Logger } from "../logging/Winston";
 import IValidatable from "../validators/IValidatable";
 import IValidator from "../validators/IValidator";
 
@@ -25,7 +25,6 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
 
     public async handleChallenge(request: Request, response: Response) : Promise<void> {
 		const body : ChallengeQuery = new ChallengeQuery(request.query);
-		console.log("here");
         if (!ChallengeQuery.Validator.isValid(body)) {
             Logger.error(
 				`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`

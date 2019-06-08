@@ -46,7 +46,6 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	}
 
 	private async prepareRequest() : Promise<RequestInit> {
-		console.log(new TwitchRequestBody(this.subscription).getBody());
 		return {
 			headers: await this.getHeaders(),
 			body: new TwitchRequestBody(this.subscription).getBody(),

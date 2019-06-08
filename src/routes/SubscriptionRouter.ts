@@ -2,7 +2,7 @@ import Router from "./Router";
 import { Request, Response } from "express";
 import UserLayer from "../layers/UserLayer";
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
-import { Logger } from "../config/Winston";
+import { Logger } from "../logging/Winston";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";

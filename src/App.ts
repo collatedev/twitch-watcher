@@ -2,7 +2,7 @@ import * as Express from "express";
 import * as BodyParser from "body-parser";
 import IRouter from "./routes/IRouter";
 import * as morgan from "morgan";
-import {Stream, Logger} from "./config/Winston";
+import {Stream, Logger} from "./logging/Winston";
 
 export default class App {
     public app: Express.Application;

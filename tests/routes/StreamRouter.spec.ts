@@ -40,25 +40,6 @@ describe('Stream Router', () => {
     });
 
     describe('handleWebhookCall', () => {
-		it('Should fail', async () => {
-			const router : StreamRouter = new StreamRouter(new FakeRequestBuilder());
-			const request : any = mockReq({
-				body: {
-					data: []
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleWebhookCall(request, response);
-			} catch (error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.InternalError);
-			expect(response.json).to.have.been.calledWith(new ErrorMessage("Failed to process webhook data"));
-		});
-
 		it('Should process data', async () => {
 			const router : StreamRouter = new StreamRouter(new FakeRequestBuilder());
 			const request : any = mockReq({

@@ -2,13 +2,14 @@ import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import * as Dotenv from 'dotenv';
 import SubscribeRequest from './SubscribeRequest';
 import TwitchRequest from './TwitchRequest';
-import { Logger } from '../config/Winston';
+import { Logger } from '../logging/Winston';
 import TwitchResponse from './TwitchResponse';
 import TwitchSubscription from './TwitchSubscription';
 import HTTPRequestBuilder from '../request_builder/HTTPRequestBuilder';
 import IRequestBuilder from "../request_builder/IRequestBuilder";
 import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
+import TwitchCallbackURL from "../developer_tools/TwitchCallbackURL";
 
 Dotenv.config();
 // Created short hand type due to length and nesting of 
@@ -20,7 +21,8 @@ export default class Twitch {
 
 	public static async subscribe(body: SubscriptionBody) : Promise<void> {
 		try {
-			const requests : SubscribeRequest[] = this.getRequests(body);
+			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
+			const requests : SubscribeRequest[] = this.getRequests(body, callbackURL);
 			await this.makeRequests(requests);
 			Logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${body.userID}) to all webhooks`
@@ -30,11 +32,11 @@ export default class Twitch {
 		}
 	}
 
-	private static getRequests(body: SubscriptionBody) : SubscribeRequest[] {
+	private static getRequests(body: SubscriptionBody, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new SubscribeRequest(
-				new TwitchSubscription(body, topic), 
+				new TwitchSubscription(body, topic, callbackURL), 
 				this.RequestBuilder
 			));
 		}

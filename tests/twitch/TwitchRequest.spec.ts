@@ -20,7 +20,7 @@ describe("TwitchRequest", () => {
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			
@@ -36,7 +36,7 @@ describe("TwitchRequest", () => {
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 
@@ -60,7 +60,7 @@ describe("TwitchRequest", () => {
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription : TwitchSubscription = new TwitchSubscription(body, "user");
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "user", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
@@ -91,7 +91,7 @@ describe("TwitchRequest", () => {
 				callbackURL: "",
 				userID: 1
 			});
-			const subscription : TwitchSubscription = new TwitchSubscription(body, "streams");
+			const subscription : TwitchSubscription = new TwitchSubscription(body, "streams", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
 			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");

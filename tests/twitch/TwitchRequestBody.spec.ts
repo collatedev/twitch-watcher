@@ -7,7 +7,7 @@ describe("TwitchRequestBody", () => {
 	it("Should be legally constructed", () => {
 		const body : TwitchRequestBody = new TwitchRequestBody(new TwitchSubscription({
 			userID: 1
-		}, "streams"));
+		}, "streams", "foo"));
 
 		expect(body).to.not.equal(null);
 	});
@@ -16,7 +16,7 @@ describe("TwitchRequestBody", () => {
 		function createRequestBody() : TwitchRequestBody {
 			return new TwitchRequestBody(new TwitchSubscription({
 				userID: 1
-			}, "illegal"));
+			}, "illegal", "foo"));
 		}
 
 		expect(createRequestBody.bind(null)).to.throw(`Unknown topic: 'illegal'`);
