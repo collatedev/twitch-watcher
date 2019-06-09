@@ -5,6 +5,7 @@ import SubscriptionRouter from "./routes/SubscriptionRouter";
 import UserLayer from "./Layers/UserLayer";
 import StreamRouter from "./routes/StreamRouter";
 import UserFollowedRouter from "./routes/UserFollowedRouter";
+import NewFollowerRouter from "./routes/NewFollowerRouter";
 
 const PortIndex : number = 2;
 
@@ -17,6 +18,7 @@ function main() : void {
 	app.addRouter(new SubscriptionRouter(userLayer));
 	app.addRouter(new StreamRouter());
 	app.addRouter(new UserFollowedRouter());
+	app.addRouter(new NewFollowerRouter());
 
 	const port : number = parseInt(process.argv[PortIndex], 10);
 	app.start(port);
