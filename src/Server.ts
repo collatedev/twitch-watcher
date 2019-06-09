@@ -4,7 +4,7 @@ import UserModel from "./models/UserModel";
 import SubscriptionRouter from "./routes/SubscriptionRouter";
 import UserLayer from "./Layers/UserLayer";
 import StreamRouter from "./routes/StreamRouter";
-import HTTPRequestBuilder from "./request_builder/HTTPRequestBuilder";
+import UserFollowedRouter from "./routes/UserFollowedRouter";
 
 const PortIndex : number = 2;
 
@@ -15,7 +15,8 @@ function main() : void {
 	const userLayer : UserLayer = new UserLayer(new UserModel());
 	app.addRouter(new UserRouter(userLayer));
 	app.addRouter(new SubscriptionRouter(userLayer));
-	app.addRouter(new StreamRouter(new HTTPRequestBuilder()));
+	app.addRouter(new StreamRouter());
+	app.addRouter(new UserFollowedRouter());
 
 	const port : number = parseInt(process.argv[PortIndex], 10);
 	app.start(port);

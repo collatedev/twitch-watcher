@@ -5,10 +5,8 @@ import PartialValidator from "../../validators/PartialValidator";
 
 export default class TwitchOAuthBearer extends Validatable implements ITwitchOAuthBearer {
 	public static readonly ClientAuthFields : string[] = ["accessToken", "scope"];
-
-	public static readonly Validator : IValidator<TwitchOAuthBearer> = new PartialValidator("Access Token", [
-		"accessToken", "scope"
-	]);
+	public static readonly Validator : IValidator<TwitchOAuthBearer> = 
+		new PartialValidator("Access Token", TwitchOAuthBearer.ClientAuthFields);
 
 	public readonly error: string;
 	public readonly status: number;

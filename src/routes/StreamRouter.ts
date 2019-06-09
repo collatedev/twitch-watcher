@@ -1,10 +1,9 @@
 import TopicRouter from "./TopicRouter";
 import { Logger } from "../logging/Winston";
 import StreamBody from "../schemas/request/StreamBody";
-import IRequestBuilder from "../request_builder/IRequestBuilder";
 
 export default class StreamRouter extends TopicRouter<StreamBody> {	
-    constructor(requestBuilder : IRequestBuilder) {
+    constructor() {
 		super('/streams', StreamBody.Validator);
     }
 

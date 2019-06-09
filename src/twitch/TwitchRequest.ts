@@ -25,7 +25,7 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 		this.buildRequest = this.buildRequest.bind(this);
 	}
 
-	public send(): Promise<TwitchResponse> {
+	public async send(): Promise<TwitchResponse> {
 		return new Promise<TwitchResponse>(this.buildRequest);
 	}
 

@@ -1,4 +1,4 @@
-import StreamRouter from '../../src/routes/StreamRouter';
+import UserFollowedRouter from '../../src/routes/UserFollowedRouter';
 import { use, expect } from 'chai';
 import 'mocha';
 import { mockReq, mockRes } from 'sinon-express-mock';
@@ -8,11 +8,10 @@ import StatusCodes from '../../src/routes/StatusCodes';
 
 use(sinonChai);
 
-describe('Stream Router', () => {
+describe('User Followed Router', () => {
 	describe('setup', () => {
 		it('should setup the router', () => {
-            const router : StreamRouter = new StreamRouter();
-
+            const router : UserFollowedRouter = new UserFollowedRouter();
             try {
                 router.setup();
             } catch (error) {
@@ -23,7 +22,7 @@ describe('Stream Router', () => {
 
     describe('handleChallenge', () => {
 		it('Should fail', async () => {
-			const router : StreamRouter = new StreamRouter();
+			const router : UserFollowedRouter = new UserFollowedRouter();
 			const request : any = mockReq();
 			const response : any = mockRes();
 
@@ -40,7 +39,7 @@ describe('Stream Router', () => {
 		});
 
 		it('Should handle challenge', async () => {
-			const router : StreamRouter = new StreamRouter();
+			const router : UserFollowedRouter = new UserFollowedRouter();
 			const request : any = mockReq({
 				query: {
 					"hub.topic": "value",
@@ -64,7 +63,7 @@ describe('Stream Router', () => {
 
     describe('handleWebhookCall', () => {
 		it('Should process data', async () => {
-			const router : StreamRouter = new StreamRouter();
+			const router : UserFollowedRouter = new UserFollowedRouter();
 			const request : any = mockReq({
 				body: {
 					data: []
