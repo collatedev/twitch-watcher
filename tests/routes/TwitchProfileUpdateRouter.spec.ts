@@ -1,4 +1,4 @@
-import NewFollowerRouter from '../../src/routes/NewFollowerRouter';
+import TwitchProfileUpdateRouter from '../../src/routes/TwitchProfileUpdateRouter';
 import { use, expect } from 'chai';
 import 'mocha';
 import { mockReq, mockRes } from 'sinon-express-mock';
@@ -8,10 +8,10 @@ import StatusCodes from '../../src/routes/StatusCodes';
 
 use(sinonChai);
 
-describe('New Follower Router', () => {
+describe('Twitch Profile Update Router', () => {
 	describe('setup', () => {
 		it('should setup the router', () => {
-            const router : NewFollowerRouter = new NewFollowerRouter();
+            const router : TwitchProfileUpdateRouter = new TwitchProfileUpdateRouter();
             try {
                 router.setup();
             } catch (error) {
@@ -22,7 +22,7 @@ describe('New Follower Router', () => {
 
     describe('handleChallenge', () => {
 		it('Should fail', async () => {
-			const router : NewFollowerRouter = new NewFollowerRouter();
+			const router : TwitchProfileUpdateRouter = new TwitchProfileUpdateRouter();
 			const request : any = mockReq();
 			const response : any = mockRes();
 
@@ -39,7 +39,7 @@ describe('New Follower Router', () => {
 		});
 
 		it('Should handle challenge', async () => {
-			const router : NewFollowerRouter = new NewFollowerRouter();
+			const router : TwitchProfileUpdateRouter = new TwitchProfileUpdateRouter();
 			const request : any = mockReq({
 				query: {
 					"hub.topic": "value",
@@ -63,7 +63,7 @@ describe('New Follower Router', () => {
 
     describe('handleWebhookCall', () => {
 		it('Should process data', async () => {
-			const router : NewFollowerRouter = new NewFollowerRouter();
+			const router : TwitchProfileUpdateRouter = new TwitchProfileUpdateRouter();
 			const request : any = mockReq({
 				body: {
 					data: []
