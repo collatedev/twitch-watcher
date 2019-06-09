@@ -8,7 +8,7 @@ import FakeSecretGenerator from "../mocks/FakeSecretGenerator";
 import { Response, Headers } from "node-fetch";
 import * as chaiAsPromised from "chai-as-promised";
 import TwitchResponse from "../../src/twitch/TwitchResponse";
-import TwitchRequestBody from "../../src/twitch/TwitchRequestBody";
+import TwitchWebhookRequestBody from "../../src/twitch/TwitchWebhookRequestBody";
 
 should();
 use(chaiAsPromised);
@@ -60,16 +60,17 @@ describe("TwitchRequest", () => {
 				callbackURL: "",
 				userID: 1
 			});
+			TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
+
 			const subscription : TwitchSubscription = new TwitchSubscription(body, "user", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
-			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 			queueBearerResponse(builder);
 			builder.queueResponse(new Response("", {
 				status: 202
 			}));
-			
+
 			const clientID : string | undefined = process.env.TWITCH_CLIENT_ID;
 			return expect(request.send().catch((error : Error) => {
 				throw error;
@@ -79,7 +80,7 @@ describe("TwitchRequest", () => {
 					"Content-Type": "application/json",
 					"Authorization": 'Bearer asdfasdf'
 				}),
-				body: new TwitchRequestBody(subscription).getBody(),
+				body: new TwitchWebhookRequestBody(subscription).getBody(),
 				method: "POST"
 			}, new Response("", {
 				status: 202
@@ -94,7 +95,7 @@ describe("TwitchRequest", () => {
 			const subscription : TwitchSubscription = new TwitchSubscription(body, "streams", "foo");
 			const builder : FakeRequestBuilder = new FakeRequestBuilder();
 			const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
-			TwitchRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
+			TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 			builder.queueResponse(new Response("", {
 				status: 202
@@ -108,7 +109,7 @@ describe("TwitchRequest", () => {
 					"Client-ID": clientID === undefined ? "" : clientID,
 					"Content-Type": "application/json",
 				}),
-				body: new TwitchRequestBody(subscription).getBody(),
+				body: new TwitchWebhookRequestBody(subscription).getBody(),
 				method: "POST"
 			}, new Response("", {
 				status: 202

@@ -1,11 +1,10 @@
 import ITwitchRequest from "./ITwitchRequest";
-import TwitchSubscription from "./TwitchSubscription";
-import TwitchRequestBody from "./TwitchRequestBody";
 import { RequestInit, Response, Headers } from 'node-fetch';
-import HTTPRequestBuilder from "../request_builder/HTTPRequestBuilder";
 import TwitchResponse from "./TwitchResponse";
 import TwitchOAuthBearer from "../schemas/request/TwitchOAuthBearer";
 import PartialValidator from "../validators/PartialValidator";
+import ITwitchRequestBody from "./ITwitchRequestBody";
+import IRequestBuilder from "../request_builder/IRequestBuilder";
 
 type TwitchResolver = (response: TwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
@@ -13,13 +12,13 @@ type TwitchRejector = (error: Error) => void;
 export default abstract class TwitchRequest implements ITwitchRequest {
 	private readonly SubscriptionEndpoint : string = "https://api.twitch.tv/helix/webhooks/hub";
 	
-	private requestBuilder : HTTPRequestBuilder;
+	private requestBuilder : IRequestBuilder;
 	private tokenValidator : PartialValidator<TwitchOAuthBearer>;
-	private subscription: TwitchSubscription;
+	private body: ITwitchRequestBody;
 
-	constructor(subscription: TwitchSubscription, requestBuilder: HTTPRequestBuilder) {
+	constructor(body: ITwitchRequestBody, requestBuilder: IRequestBuilder) {
 		this.requestBuilder = requestBuilder;
-		this.subscription = subscription;
+		this.body = body;
 
 		this.tokenValidator = new PartialValidator<TwitchOAuthBearer>("Token", TwitchOAuthBearer.ClientAuthFields);
 		this.buildRequest = this.buildRequest.bind(this);
@@ -48,14 +47,14 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	private async prepareRequest() : Promise<RequestInit> {
 		return {
 			headers: await this.getHeaders(),
-			body: new TwitchRequestBody(this.subscription).getBody(),
+			body: this.body.getBody(),
 			method: "POST"
 		};
 	}
 
 	private async getHeaders(): Promise<Headers> {
 		const clientID : string = this.getClientID();
-		if (this.subscription.authorizationRequired) {
+		if (this.body.requiresAuthorization()) {
 			return new Headers({
 				"Client-ID": clientID,
 				"Content-Type": "application/json",
@@ -99,6 +98,6 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	private getAccessTokenRequestURL() : string {
 		return `https://id.twitch.tv/oauth2/token?client_id=` +
 			`${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}` +
-			`&grant_type=client_credentials&scope=${this.subscription.scope}`;
+			`&grant_type=client_credentials&scope=${this.body.getScope()}`;
 	}
 }

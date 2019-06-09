@@ -1,10 +1,11 @@
 import TwitchRequest from "./TwitchRequest";
 import TwitchSubscription from "./TwitchSubscription";
-import HTTPRequestBuilder from "../request_builder/HTTPRequestBuilder";
+import TwitchWebhookRequestBody from "./TwitchWebhookRequestBody";
+import IRequestBuilder from "../request_builder/IRequestBuilder";
 
 export default class SubscribeRequest extends TwitchRequest {
-	constructor(subscription: TwitchSubscription, requestBuilder: HTTPRequestBuilder) {
+	constructor(subscription: TwitchSubscription, requestBuilder: IRequestBuilder) {
 		subscription.mode = "subscribe";
-		super(subscription, requestBuilder);
+		super(new TwitchWebhookRequestBody(subscription), requestBuilder);
 	}
 }

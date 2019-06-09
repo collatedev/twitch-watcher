@@ -1,10 +1,15 @@
-import ITwitchRequestBody from "./ITwitchRequestBody";
+import ITwitchWebhookRequestBody from "./ITwitchWebhookRequestBody";
 import * as Path from "path";
 import TwitchSubscription from "./TwitchSubscription";
 import SecretGenerator from "./SecretGenerator";
+import ITwitchRequestBody from "./ITwitchRequestBody";
+import AuthorizedTopic from "./AuthorizedTopic";
 
-export default class TwitchRequestBody implements ITwitchRequestBody {
+export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBody, ITwitchRequestBody {
 	public static SecretGenerator: SecretGenerator = new SecretGenerator(SecretGenerator.DefaultAlphabet);
+
+	private isAuthorizedTopic: boolean;
+	private scope: string;
 
 	public "hub.mode": string;
 	public "hub.topic": string;
@@ -12,20 +17,24 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 	public "hub.lease_seconds": number;
 	public "hub.secret": string;
 
-	
 	private readonly LeaseSeconds : number = 864000; // 10 days in seconds
 	private readonly SecretSize : number = 16;
-	
 
 	constructor(subscription: TwitchSubscription) {
-		this["hub.mode"] = subscription.mode;
-		this["hub.lease_seconds"] = this.LeaseSeconds;
-		this["hub.secret"] = TwitchRequestBody.SecretGenerator.generateSecret(this.SecretSize);
-		this["hub.callback"] = Path.join(subscription.callbackURL, subscription.topic).replace(':', ':/');
-		this["hub.topic"] = TwitchRequestBody.generateTopicURL(subscription);
+		this.isAuthorizedTopic = AuthorizedTopic.isAuthorizedTopic(subscription.topic);
+		this.scope = AuthorizedTopic.scope(subscription.topic);
+		this.setupBodyFields(subscription);
 	}
 
-	private static generateTopicURL(subscription: TwitchSubscription): string {
+	private setupBodyFields(subscription: TwitchSubscription) : void {
+		this["hub.mode"] = subscription.mode;
+		this["hub.lease_seconds"] = this.LeaseSeconds;
+		this["hub.secret"] = TwitchWebhookRequestBody.SecretGenerator.generateSecret(this.SecretSize);
+		this["hub.callback"] = Path.join(subscription.callbackURL, subscription.topic).replace(':', ':/');
+		this["hub.topic"] = this.generateTopicURL(subscription);
+	}
+
+	private generateTopicURL(subscription: TwitchSubscription): string {
 		switch(subscription.topic) {
 			case "follow/new":
 				return `https://api.twitch.tv/helix/users/follows?first=1&to_id=${subscription.userID}`;
@@ -38,6 +47,14 @@ export default class TwitchRequestBody implements ITwitchRequestBody {
 			default:
 				throw new Error(`Unknown topic: '${subscription.topic}'`);
 		}
+	}
+
+	public requiresAuthorization() : boolean {
+		return this.isAuthorizedTopic;
+	}
+
+	public getScope() : string {
+		return this.scope;
 	}
 
 	public getBody() : string {

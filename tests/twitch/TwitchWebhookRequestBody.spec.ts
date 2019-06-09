@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import TwitchRequestBody from "../../src/twitch/TwitchRequestBody";
+import TwitchWebhookRequestBody from "../../src/twitch/TwitchWebhookRequestBody";
 import TwitchSubscription from "../../src/twitch/TwitchSubscription";
 
 describe("TwitchRequestBody", () => {
 	it("Should be legally constructed", () => {
-		const body : TwitchRequestBody = new TwitchRequestBody(new TwitchSubscription({
+		const body : TwitchWebhookRequestBody = new TwitchWebhookRequestBody(new TwitchSubscription({
 			userID: 1
 		}, "streams", "foo"));
 
@@ -13,8 +13,8 @@ describe("TwitchRequestBody", () => {
 	});
 
 	it("Should be illegally constructed", () => {
-		function createRequestBody() : TwitchRequestBody {
-			return new TwitchRequestBody(new TwitchSubscription({
+		function createRequestBody() : TwitchWebhookRequestBody {
+			return new TwitchWebhookRequestBody(new TwitchSubscription({
 				userID: 1
 			}, "illegal", "foo"));
 		}
