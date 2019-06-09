@@ -1,4 +1,4 @@
-import TwitchWebhook from "../src/schemas/TwitchWebhook";
+import TwitchWebhook from "../src/schemas/user/TwitchWebhook";
 
 export default interface ITwitchWatcher {
 	subscribe(topic: string, userID: number): Promise<boolean>;

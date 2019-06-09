@@ -2,6 +2,7 @@ import UserModel from "../models/UserModel";
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import TwitchUser from "../schemas/user/TwitchUser";
 import UnsubscriptionBody from "../schemas/request/IUnsubscriptionBody";
+import Twitch from "../twitch/Twitch";
 
 export default class UserLayer {
     protected userModel: UserModel;
@@ -10,7 +11,7 @@ export default class UserLayer {
         this.userModel = userModel;
     }
 
-    public async getUserInfo(id: number) {
+    public async getUserInfo(id: number) : Promise<TwitchUser> {
         try {
             return await this.userModel.getByID(id);
         } catch (exception) {
@@ -19,12 +20,13 @@ export default class UserLayer {
     }
 
     public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
-		let user = this.userModel.getByID(subscriptionBody.userID);
+		const user : TwitchUser = await this.userModel.getByID(subscriptionBody.userID); // should be the user service library
+		await Twitch.subscribe(subscriptionBody);
         return user;
 	}
 
-    public async unsubscribe(unsubscriptionBody: UnsubscriptionBody) {
-        let user = this.userModel.getByID(unsubscriptionBody.userID);
+    public async unsubscribe(unsubscriptionBody: UnsubscriptionBody): Promise<TwitchUser> {
+        const user : TwitchUser = await this.userModel.getByID(unsubscriptionBody.userID);
         return user;
     }
 }

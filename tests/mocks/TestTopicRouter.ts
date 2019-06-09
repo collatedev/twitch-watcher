@@ -1,26 +1,27 @@
 import TopicRouter from "../../src/routes/TopicRouter";
-import Validatable from "../../src/validators/Validatable";
-
-const TestBodyFields : Array<string> = [];
-
-class TestBody extends Validatable {
-
-}
+import TestBody from "./TestBody";
+import PartialValidator from "../../src/validators/PartialValidator";
 
 export default class TestTopicRouter extends TopicRouter<TestBody> {    
-    private shouldFail: boolean
+	private static readonly TestBodyFields: string[] = ["a"];
+    private shouldFail: boolean;
 
     constructor() {
-        super('/test', TestBodyFields);
+		super('/test', new PartialValidator<TestBody>("Test Body", TestTopicRouter.TestBodyFields));
+		this.shouldFail = false;
     }
 
-    public failNextRequest() {
+    public failNextRequest() : void {
         this.shouldFail = true;
-    }
+	}
+	
+	protected getBody(body: any) : TestBody {
+		return new TestBody(body);
+	}
 
-    protected async handleWebhookData(body: {}): Promise<void> {
+    protected async handleWebhookData(body: TestBody): Promise<void> {
         if (this.shouldFail) {
-            throw new Error('failed processing data');
+            throw new Error('Failed to process data');
         }
         this.shouldFail = false;
     }

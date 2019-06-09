@@ -3,7 +3,7 @@ export default interface IStreamData {
 	user_id: number;
 	user_name: string;
 	game_id: number;
-	community_ids: Array<number>;
+	community_ids: number[];
 	type: string;
 	title: string;
 	viewer_count: number;

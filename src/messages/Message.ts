@@ -1,6 +1,6 @@
 export default class Message {
-	private message: string;
-	private success: boolean;
+	public readonly message : string;
+	public readonly success : boolean;
 	
 	constructor(message: string, success: boolean) {
 		this.message = message;

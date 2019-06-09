@@ -64,10 +64,8 @@
 		}
 	  },
 	  "SubscribeBody": {
+		"type": "object",
 		"properties": {
-		  "topic": {
-			"type": "string"
-		  },
 		  "callback": {
 			"type": "string"
 		  },
@@ -77,10 +75,8 @@
 		}
 	  },
 	  "UnsubscribeBody": {
+		"type": "object",
 		"properties": {
-		  "topic": {
-			"type": "string"
-		  },
 		  "userID": {
 			"type": "integer"
 		  }

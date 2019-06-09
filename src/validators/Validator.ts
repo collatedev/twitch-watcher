@@ -4,7 +4,7 @@ import StatusCodes from "../routes/StatusCodes";
 import ErrorMessage from "../messages/ErrorMessage";
 import IValidatable from "./IValidatable";
 
-export default abstract class ObjectValidator<T extends IValidatable> implements IValidator<T> {
+export default class Validator<T extends IValidatable> implements IValidator<T> {
 	private name: string;
 
 	constructor(name: string) {
@@ -16,46 +16,29 @@ export default abstract class ObjectValidator<T extends IValidatable> implements
 			return false;
 		}
 		
-		let values = Object.values(body);
-		for (let i = 0; i < values.length; i++) {
-			if (values[i] === null || values[i] === undefined) {
+		const values : any[] = Object.values(body);
+		for (const value of values) {
+			if (value === null || value === undefined) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private wasObjectCasted(body: T) {
+	private wasObjectCasted(body: T) : boolean {
 		try {
-			// this will fail if an object was casted to this type with out the method
-			let properties = body.getProperties(); 
-			let keys = this.getKeys(body);
-
-			if (properties.length != keys.length) {
-				return false;
-			}
-
-			for (let i = 0; i < properties.length; i++) {
-				if (keys.indexOf(properties[i]) == -1) {
-					return true;
-				}
-			}
+			// this will fail if an object was casted to this 
+			// type because properties method will be undefined
+			body.getProperties();
 			return false;
 		} catch (error) {
 			return true;
 		}
 	}
-
-	private getKeys(body: T) {
-        let keys = Object.keys(body);
-        return keys.map((key) => {
-            return key.trim();
-        });
-    }
 	
 	public sendError(response: Response, body: T): void {
 		if (this.wasObjectCasted(body)) {
-			let error = new ErrorMessage(
+			const error : ErrorMessage = new ErrorMessage(
 				`Can not handle casted ${this.name}s. Check your route for ${this.name} casting`
 			);
 			response.json(error).status(StatusCodes.InternalError);
@@ -65,13 +48,13 @@ export default abstract class ObjectValidator<T extends IValidatable> implements
 	}
 
 	private getErrorMessage(body: T): ErrorMessage {
-		let values = Object.values(body);
-		let keys = Object.keys(body);
-		for (let i = 0; i < values.length; i++) {
+		const values : any[] = Object.values(body);
+		const keys : string[] = Object.keys(body);
+		for (let i : number = 0; i < values.length; i++) {
 			if (values[i] === null || values[i] === undefined) {
 				return new ErrorMessage(`${this.name} is missing property: '${keys[i]}' it is either null or undefined`);
 			}
 		}
-		return new ErrorMessage(`Should never reach this error message because the ${this.name} is valid.`);
+		throw new Error(`Should never reach this error message because the ${this.name} is valid.`);
     }
 }
