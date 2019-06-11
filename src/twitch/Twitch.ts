@@ -9,9 +9,10 @@ import HTTPRequestBuilder from '../request_builder/HTTPRequestBuilder';
 import IRequestBuilder from "../request_builder/IRequestBuilder";
 import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
-import TwitchCallbackURL from "../developer_tools/TwitchCallbackURL";
+import TwitchCallbackURL from "./TwitchCallbackURL";
 
 Dotenv.config();
+
 // Created short hand type due to length and nesting of 
 // Array<Promise<TwitchResponse>>
 type PendingTwitchResponse = Promise<TwitchResponse>;
