@@ -2,9 +2,16 @@ import ITwitchRequest from "./ITwitchRequest";
 import { RequestInit, Response, Headers } from 'node-fetch';
 import TwitchResponse from "./TwitchResponse";
 import TwitchOAuthBearer from "../schemas/request/TwitchOAuthBearer";
-import PartialValidator from "../validators/PartialValidator";
 import ITwitchRequestBody from "./ITwitchRequestBody";
 import IRequestBuilder from "../request_builder/IRequestBuilder";
+import TwitchOAuthBearerSchema from "../../api/TwitchOAuthBearer.json";
+import { 
+	ValidationSchema, 
+	IValidationResult, 
+	IValidator, 
+	Validator, 
+	IValidationSchema,
+} from "@collate/request-validator";
 
 type TwitchResolver = (response: TwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
@@ -13,14 +20,15 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	private readonly SubscriptionEndpoint : string = "https://api.twitch.tv/helix/webhooks/hub";
 	
 	private requestBuilder : IRequestBuilder;
-	private tokenValidator : PartialValidator<TwitchOAuthBearer>;
 	private body: ITwitchRequestBody;
+	private tokenValidator : IValidator;
+	private tokenValidationSchema : IValidationSchema;
 
 	constructor(body: ITwitchRequestBody, requestBuilder: IRequestBuilder) {
 		this.requestBuilder = requestBuilder;
 		this.body = body;
-
-		this.tokenValidator = new PartialValidator<TwitchOAuthBearer>("Token", TwitchOAuthBearer.ClientAuthFields);
+		this.tokenValidator = new Validator();
+		this.tokenValidationSchema = new ValidationSchema(TwitchOAuthBearerSchema);
 		this.buildRequest = this.buildRequest.bind(this);
 	}
 
@@ -88,11 +96,18 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 			{ method: "POST" }
 		);
 		const bearer : TwitchOAuthBearer = new TwitchOAuthBearer(await response.json());
-		if (this.tokenValidator.isValid(bearer)) {
+		const result : IValidationResult = this.tokenValidator.validate(bearer as any, this.tokenValidationSchema);
+
+		if (result.isValid()) {
 			return bearer.accessToken;
 		} else {
-			throw new Error(`[${bearer.error}]: ${bearer.message}`);
+			throw new Error(this.getErrorMessage(result));
 		}
+	}
+
+	private getErrorMessage(result : IValidationResult) : string {
+		const spacing : number = 4;
+		return JSON.stringify(result.errors(), null, spacing);
 	}
 
 	private getAccessTokenRequestURL() : string {

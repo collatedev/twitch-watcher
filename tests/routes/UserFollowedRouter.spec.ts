@@ -1,81 +1,74 @@
 import UserFollowedRouter from '../../src/routes/UserFollowedRouter';
-import { use, expect } from 'chai';
-import 'mocha';
-import { mockReq, mockRes } from 'sinon-express-mock';
-import * as sinonChai from 'sinon-chai';
 import ErrorMessage from '../../src/messages/ErrorMessage';
 import StatusCodes from '../../src/routes/StatusCodes';
+import mockResponse from '../mocks/MockResponse';
+import mockRequest from '../mocks/MockRequest';
+import IRouteHandler from '../../src/routes/IRouteHandler';
 
-use(sinonChai);
+const Router : UserFollowedRouter = new UserFollowedRouter();
 
-describe('User Followed Router', () => {
-	describe('setup', () => {
-		it('should setup the router', () => {
-            const router : UserFollowedRouter = new UserFollowedRouter();
-            try {
-                router.setup();
-            } catch (error) {
-                throw error;
-            }
-        });
+describe("setup()", () => {
+	test('should setup the router', () => {
+		Router.setup();
 	});
+});
 
-    describe('handleChallenge', () => {
-		it('Should fail', async () => {
-			const router : UserFollowedRouter = new UserFollowedRouter();
-			const request : any = mockReq();
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
+describe("validate() [middleware]", () => {
+	test('Should fail to handle challenge', (done : any) => {
+		const request : any = mockRequest({
+			query: {
+				"hub.lease_seconds": 500,
+				"hub.mode": "subscribe",
+				"hub.challenge": "bar"
 			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.topic' it is either null or undefined")
+		});
+		const response : any = mockResponse();
+	
+		const middleWare : IRouteHandler = Router.validate(Router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.topic'",
+					}
+				])
 			);
+			done();
 		});
+	});
+});
 
-		it('Should handle challenge', async () => {
-			const router : UserFollowedRouter = new UserFollowedRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.topic": "value",
-					"hub.mode": "value",
-					"hub.lease_seconds": 123,
-					"hub.challenge": "challenge_token"
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-			expect(response.send).to.have.been.calledWith("challenge_token");
-		});
-    });
-
-    describe('handleWebhookCall', () => {
-		it('Should process data', async () => {
-			const router : UserFollowedRouter = new UserFollowedRouter();
-			const request : any = mockReq({
-				body: {
-					data: []
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleWebhookCall(request, response);
-			} catch(error) {
-				throw error;
+describe("handleChallenge()", () => {
+	
+	test('Should handle challenge', async () => {
+		const request : any = mockRequest({
+			query: {
+				"hub.topic": "value",
+				"hub.mode": "value",
+				"hub.lease_seconds": 123,
+				"hub.challenge": "challenge_token"
 			}
 		});
-    });
+		const response : any = mockResponse();
+
+		await Router.handleChallenge(request, response);
+	
+		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+		expect(response.send).toHaveBeenCalledWith("challenge_token");
+	});
+});
+
+describe("handleWebhookCall()", () => {
+	test('Should process data', async () => {
+		const request : any = mockRequest({
+			body: {
+				data: []
+			}
+		});
+		const response : any = mockResponse();
+	
+		await Router.handleWebhookCall(request, response);
+	});
 });

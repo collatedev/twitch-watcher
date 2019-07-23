@@ -1,3 +1,3 @@
 export default interface IUnsubscriptionBody {
-    userID: number
+    userID: number;
 }

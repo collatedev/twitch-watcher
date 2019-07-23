@@ -1,15 +1,9 @@
 import UserRouter from "../../src/routes/UserRouter";
-import { use, expect } from 'chai';
-import 'mocha';
-import FakeUserModel from "../mocks/FakeUserModel";
-import { mockReq, mockRes } from 'sinon-express-mock';
-import * as sinonChai from 'sinon-chai';
+import FakeUserModel from "../fakes/FakeUserModel";
 import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
 import UserLayer from "../../src/layers/UserLayer";
 import StatusCodes from "../../src/routes/StatusCodes";
-
-use(sinonChai);
 
 describe('User Router', () => {
 	describe('setup', () => {
