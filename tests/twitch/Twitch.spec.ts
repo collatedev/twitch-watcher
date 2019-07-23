@@ -1,60 +1,52 @@
-import { use, expect, should } from 'chai';
-import 'mocha';
 import Twitch from "../../src/twitch/Twitch";
-import FakeRequesetBuilder from "../mocks/FakeRequestBuilder";
+import FakeRequesetBuilder from "../fakes/FakeRequestBuilder";
 import SubscriptionBody from '../../src/schemas/request/SubscriptionBody';
 import { Response } from 'node-fetch';
-import * as chaiAsPromised from "chai-as-promised";
 import StatusCodes from '../../src/routes/StatusCodes';
+import TwitchWebhookRequestBody from "../../src/twitch/TwitchWebhookRequestBody";
+import FakeSecretGenerator from "../fakes/FakeSecretGenerator";
 
-should();
-use(chaiAsPromised);
 const WebhookCount : number = 4;
 
-describe('Twitch', () => {
-	describe('subscribe', () => {
-		it('Should send all subscriptions successfully', async () => {
-			const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
-			queueBearerResponse(requestBuilder);
-			queueAuthorizationResponses(requestBuilder, StatusCodes.Accepted);
-			Twitch.RequestBuilder = requestBuilder;
+describe('subscribe', () => {
+	test('Should send all subscriptions successfully', async () => {
+		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
+		queueBearerResponse(requestBuilder);
+		queueAuthorizationResponses(requestBuilder, StatusCodes.Accepted);
+		Twitch.RequestBuilder = requestBuilder;
+		
+		await Twitch.subscribe(new SubscriptionBody({
+			callbackURL: "",
+			userID: 123
+		}));
+	});
 
-			try {
-				await Twitch.subscribe(new SubscriptionBody({
-					callbackURL: "",
-					userID: 123
-				}));
-			} catch(error) {
-				throw error;
-			}
-		});
+	test('Should fail to send request due to bad request statuses', async () => {
+		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
+		queueBearerResponse(requestBuilder);
+		queueAuthorizationResponses(requestBuilder, StatusCodes.BadRequest);
+		Twitch.RequestBuilder = requestBuilder;
+		TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
-		it('Should fail to send request due to bad request statuses', async () => {
-			const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
-			queueBearerResponse(requestBuilder);
-			queueAuthorizationResponses(requestBuilder, StatusCodes.BadRequest);
-			Twitch.RequestBuilder = requestBuilder;
+		await expect(Twitch.subscribe(new SubscriptionBody({
+			callbackURL: "",
+			userID: 123
+		}))).rejects.toEqual(new Error(
+			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
+			`helix/users/follows?first=1&to_id=123","hub.secret":"secret","hub.callba` +
+			`ck":"https://a368d28e.ngrok.io/api/v1/topic/follow/new","hub.lease_seconds":864000}`
+		));
+	});
 
-			return expect(Twitch.subscribe(new SubscriptionBody({
-				callbackURL: "",
-				userID: 123
-			})).catch((error : Error) => {
-				throw error;
-			})).to.eventually.be.rejectedWith(Error);
-		});
+	test('Should fail to send subscriptions due to a failed request', async () => {
+		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
+		queueBearerResponse(requestBuilder);
+		Twitch.RequestBuilder = requestBuilder;
 
-		it('Should fail to send subscriptions due to a failed request', async () => {
-			const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
-			queueBearerResponse(requestBuilder);
-			Twitch.RequestBuilder = requestBuilder;
-
-			return expect(Twitch.subscribe(new SubscriptionBody({
-				callbackURL: "",
-				userID: 123
-			})).catch((error : Error) => {
-				throw error;
-			})).to.eventually.be.rejectedWith("Request Failed");
-		});
+		await expect(Twitch.subscribe(new SubscriptionBody({
+			callbackURL: "",
+			userID: 123
+		}))).rejects.toEqual(new Error("Request Failed"));
 	});
 });
 

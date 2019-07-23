@@ -1,5 +1,3 @@
-import "mocha";
-import { expect } from "chai";
 import TwitchWebhookRequestBody from "../../src/twitch/TwitchWebhookRequestBody";
 import TwitchSubscription from "../../src/twitch/TwitchSubscription";
 
@@ -9,16 +7,14 @@ describe("TwitchRequestBody", () => {
 			userID: 1
 		}, "streams", "foo"));
 
-		expect(body).to.not.equal(null);
+		expect(body).not.toBeNull();
 	});
 
 	it("Should be illegally constructed", () => {
-		function createRequestBody() : TwitchWebhookRequestBody {
+		expect(() => {
 			return new TwitchWebhookRequestBody(new TwitchSubscription({
 				userID: 1
 			}, "illegal", "foo"));
-		}
-
-		expect(createRequestBody.bind(null)).to.throw(`Unknown topic: 'illegal'`);
+		}).toThrow(`Unknown topic: 'illegal'`);
 	});
 });

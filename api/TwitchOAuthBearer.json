@@ -1,17 +1,17 @@
 {
     "types": {
         "request": {
-            "accessToken": {
-                "type": "string",
-                "required": true
-            },
-	        "refreshToken": {
+            "access_token": {
                 "type": "string",
                 "required": false
             },
+	        "refresh_token": {
+                "type": "any",
+                "required": false
+            },
 	        "scope": {
-                "type": "array[string]",
-                "required": true
+                "type": "string",
+                "required": false
             },
 	        "error": {
                 "type": "string",

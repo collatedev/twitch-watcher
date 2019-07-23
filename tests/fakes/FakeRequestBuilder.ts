@@ -19,8 +19,6 @@ export default class FakeRequestBuilder implements IRequestBuilder {
 		return new Promise((resolve: RequestResolver, reject: RequestRejector): void => {
 			if (this.responses.length === 0) {
 				return reject(new Error('Request Failed'));
-			} else if (this.responses[0] === undefined) {
-					return reject(new Error('Request Failed'));
 			} else {
 				return resolve(this.responses.shift());
 			}

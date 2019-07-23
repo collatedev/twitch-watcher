@@ -11,6 +11,7 @@ import {
 	IValidator, 
 	Validator, 
 	IValidationSchema,
+	Validatable
 } from "@collate/request-validator";
 
 type TwitchResolver = (response: TwitchResponse) => void;
@@ -95,14 +96,17 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 			this.getAccessTokenRequestURL(), 
 			{ method: "POST" }
 		);
-		const bearer : TwitchOAuthBearer = new TwitchOAuthBearer(await response.json());
-		const result : IValidationResult = this.tokenValidator.validate(bearer as any, this.tokenValidationSchema);
+		const json : any = await response.json();
+		const bearer : TwitchOAuthBearer = new TwitchOAuthBearer(json);
+		const result : IValidationResult = this.tokenValidator.validate(new Validatable(json), this.tokenValidationSchema);
 
 		if (result.isValid()) {
+			if (bearer.error) {
+				throw new Error(`[${bearer.error}]: ${bearer.message}`);
+			}
 			return bearer.accessToken;
-		} else {
-			throw new Error(this.getErrorMessage(result));
 		}
+		throw new Error(this.getErrorMessage(result));
 	}
 
 	private getErrorMessage(result : IValidationResult) : string {

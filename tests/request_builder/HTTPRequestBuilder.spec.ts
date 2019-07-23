@@ -1,11 +1,12 @@
 import HTTPRequestBuilder from "../../src/request_builder/HTTPRequestBuilder";
 
-test("Should make a request", () => {
+test("Should make a request", (done : any) => {
 	const requestBuilder : HTTPRequestBuilder = new HTTPRequestBuilder();
 	
-	expect(requestBuilder.makeRequest("http://localhost:1", {
+	requestBuilder.makeRequest("http://localhost:1", {
 		method: "GET"
-	})).resolves.toThrow(Error).catch((error : Error) => {
-		throw error;
+	}).catch((error : any) => {
+		expect(error).not.toBeNull();
+		done();
 	});
 });
