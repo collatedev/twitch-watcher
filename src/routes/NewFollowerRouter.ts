@@ -4,11 +4,11 @@ import UserFollowRequestSchema from "../../api/UserFollowRequest.json";
 import { ValidationSchema } from "@collate/request-validator";
 
 export default class NewFollowerRouter extends TopicRouter {	
-    constructor() {
+	constructor() {
 		super('/follow/new', new ValidationSchema(UserFollowRequestSchema));
-    }
+	}
 
-    protected async handleWebhookData(rawBody: any): Promise<void> {
+	protected async handleWebhookData(rawBody: any): Promise<void> {
 		Logger.info(`New Follower webhook recieved body: ${JSON.stringify(rawBody)}`);
 	}
 }

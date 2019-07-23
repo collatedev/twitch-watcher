@@ -3,31 +3,46 @@ import ErrorMessage from '../../src/messages/ErrorMessage';
 import StatusCodes from '../../src/routes/StatusCodes';
 import mockResponse from '../mocks/MockResponse';
 import mockRequest from '../mocks/MockRequest';
+import IRouteHandler from '../../src/routes/IRouteHandler';
+
+const Router : NewFollowerRouter = new NewFollowerRouter();
 
 describe("setup()", () => {
 	test('should setup the router', () => {
-		const router : NewFollowerRouter = new NewFollowerRouter();
+		Router.setup();
+	});
+});
+
+describe("validate() [middleware]", () => {
+	test('Should fail to handle challenge', (done : any) => {
+		const request : any = mockRequest({
+			query: {
+				"hub.lease_seconds": 500,
+				"hub.mode": "subscribe",
+				"hub.challenge": "bar"
+			}
+		});
+		const response : any = mockResponse();
 	
-		router.setup();
+		const middleWare : IRouteHandler = Router.validate(Router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.topic'",
+					}
+				])
+			);
+			done();
+		});
 	});
 });
 
 describe("handleChallenge()", () => {
-	test('Should fail to handle challenge', async () => {
-		const router : NewFollowerRouter = new NewFollowerRouter();
-		const request : any = mockRequest({});
-		const response : any = mockResponse();
-	
-		await router.handleChallenge(request, response);
-	
-		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-		expect(response.json).toHaveBeenCalledWith(
-			new ErrorMessage("Challenge Query is missing property: 'hub.topic' test is etesther null or undefined")
-		);
-	});
 	
 	test('Should handle challenge', async () => {
-		const router : NewFollowerRouter = new NewFollowerRouter();
 		const request : any = mockRequest({
 			query: {
 				"hub.topic": "value",
@@ -37,8 +52,8 @@ describe("handleChallenge()", () => {
 			}
 		});
 		const response : any = mockResponse();
-	
-		await router.handleChallenge(request, response);
+
+		await Router.handleChallenge(request, response);
 	
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
 		expect(response.send).toHaveBeenCalledWith("challenge_token");
@@ -47,7 +62,6 @@ describe("handleChallenge()", () => {
 
 describe("handleWebhookCall()", () => {
 	test('Should process data', async () => {
-		const router : NewFollowerRouter = new NewFollowerRouter();
 		const request : any = mockRequest({
 			body: {
 				data: []
@@ -55,6 +69,6 @@ describe("handleWebhookCall()", () => {
 		});
 		const response : any = mockResponse();
 	
-		await router.handleWebhookCall(request, response);
+		await Router.handleWebhookCall(request, response);
 	});
 });

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import * as Express from "express";
 import IRouter from "./IRouter";
 import * as Path from "path";
-import ErrorMessage from "../messages/ErrorMessage";
+// import ErrorMessage from "../messages/ErrorMessage";
 import DataMessage from "../messages/DataMessage";
 import IRouteHandler from "./IRouteHandler";
 import { 
@@ -15,6 +15,7 @@ import {
     IValidationResult
 } from "@collate/request-validator";
 import StatusCodes from "./StatusCodes";
+import ErrorMessage from "../messages/ErrorMessage";
 
 const RouteValidator : IValidator = new Validator();
 
@@ -59,32 +60,32 @@ export default abstract class Router implements IRouter {
         this.router.put(path, this.validate(schema), handler);
     }
 
-    private validate(schema : IValidationSchema) : IRouteHandler {
-        return (request : Request, response : Response, next : NextFunction | undefined) : void => {
+    public validate(schema : IValidationSchema) : IRouteHandler {
+        return (request : Request, response : Response, next? : NextFunction) : void => {
             const requestSchema : IValidationSchema = schema;
 
-            if (this.isEmpty(request.body)) {
+            if (!this.isEmpty(request.body)) {
                 this.requestBuilder.setBody(request.body);
             } 
-            if (this.isEmpty(request.cookies)) {
+            if (!this.isEmpty(request.cookies)) {
                 this.requestBuilder.setCookies(request.cookies);
             }
-            if (this.isEmpty(request.headers)) {
+            if (!this.isEmpty(request.headers)) {
                 this.requestBuilder.setHeaders(request.headers);
             } 
-            if (this.isEmpty(request.params)) {
+            if (!this.isEmpty(request.params)) {
                 this.requestBuilder.setParams(request.params);
             }
-            if (this.isEmpty(request.query)) {
+            if (!this.isEmpty(request.query)) {
                 this.requestBuilder.setQuery(request.query);
             } 
 
             const result : IValidationResult = RouteValidator.validate(this.requestBuilder.build(), requestSchema);
             if (!result.isValid()) {
-                this.sendError(response, JSON.stringify(result.errors), StatusCodes.BadRequest);
+                this.sendError(response, result.errors(), StatusCodes.BadRequest);
             }
             if (next) {
-                next();
+                return next();
             }
             throw new Error('Missing route handler');
         };
@@ -99,7 +100,7 @@ export default abstract class Router implements IRouter {
         return true;
     }
 
-    protected sendError(response: Express.Response, message: string, status: number) : void {
+    protected sendError(response: Express.Response, message: any, status: number) : void {
         response
             .json(new ErrorMessage(message))
             .status(status);
