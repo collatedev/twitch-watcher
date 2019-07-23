@@ -7,7 +7,6 @@ import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
 
-
 export default class SubscriptionRouter extends Router {
     private userLayer : UserLayer;
 
