@@ -1,29 +1,13 @@
 import TopicRouter from "../../src/routes/TopicRouter";
 import TestBody from "./TestBody";
-import PartialValidator from "../../src/validators/PartialValidator";
 import { ValidationSchema } from "@collate/request-validator";
+import TestTopicSchema from "../api/TestTopic.json";
 
 export default class TestTopicRouter extends TopicRouter {    
-	private static readonly TestBodyFields: string[] = ["a"];
     private shouldFail: boolean;
 
     constructor() {
-		super('/test', new ValidationSchema({
-            types: {
-                request: {
-                    body: {
-                        type: "body",
-                        required: true
-                    },
-                },
-                body: {
-                    a: {
-                        type: "boolean",
-                        required: true
-                    }         
-                }
-            }
-        }));
+		super('/test', new ValidationSchema(TestTopicSchema));
 		this.shouldFail = false;
     }
 

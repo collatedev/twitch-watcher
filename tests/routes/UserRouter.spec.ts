@@ -4,104 +4,80 @@ import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
 import UserLayer from "../../src/layers/UserLayer";
 import StatusCodes from "../../src/routes/StatusCodes";
+import mockResponse from '../mocks/mockResponse';
+import mockRequest from '../mocks/mockRequest';
+import IRouteHandler from "../../src/routes/IRouteHandler";
 
-describe('User Router', () => {
-	describe('setup', () => {
-		const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
 
-		try {
-			router.setup();
-		} catch (error) {
-			throw error;
-		}
-	});
-
-    describe('handleGetUserByID', () => {
-        it('Should fail due to a string userID', async () => {
-            const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                params: {
-                    userID: "String"
-                }
-            });
-            const response : any = mockRes();
-
-            try {
-				await router.handleGetUserByID(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("The Twitch User ID must be a positive integer value, instead received 'NaN'")
-            );
+describe("validate() [middleware]", () => {
+	test('Should fail to validate due to incorrect type', (done : any) => {
+        const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
+        router.setup();
+		const request : any = mockRequest({
+            params: {
+                userID: "string"
+            }
         });
-
-        it('Should fail due to a float userID', async () => {
-            const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                params: {
-                    userID: 1.1
-                }
-            });
-            const response : any = mockRes();
-
-            try {
-				await router.handleGetUserByID(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("The Twitch User ID must be a positive integer value, instead received '1.1'")
-            );
-        });
-
-        it('Should fail because user does not exist', async () => {
-            const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                params: {
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
-
-            try {
-				await router.handleGetUserByID(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.NotFound);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Failed to get user with id: 1")
-            );
-        });
-
-        it('Should get user data', async () => {
-            const twitchModel : FakeUserModel = new FakeUserModel();
-            const userLayer : UserLayer = new UserLayer(twitchModel);
-            const router : UserRouter = new UserRouter(userLayer);
-            const request : any = mockReq({
-                params: {
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
-            twitchModel.addUser(1);
-
-            try {
-				await router.handleGetUserByID(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-            expect(response.json).to.have.been.calledWith(
-				new DataMessage(await twitchModel.getByID(1))
+		const response : any = mockResponse();
+	
+		const middleWare : IRouteHandler = router.validate(router.getSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "params.userID",
+						message: "Property 'userID' should be type 'number'",
+					}
+				])
 			);
-        });
+			done();
+		});
+    });
+    
+    test('Should fail due to a float userID [TODO]', async () => {
+        // Need to update sanitizer to ensure that only integers can be passed
     });
 });
+
+describe('handleGetUserByID()', () => {
+    test('Should fail because user does not exist', async () => {
+        const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()));
+        router.setup();
+        const request : any = mockRequest({
+            params: {
+                userID: 1
+            }
+        });
+        const response : any = mockResponse();
+
+        await router.handleGetUserByID(request, response);
+
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.NotFound);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage("Failed to get user with id: 1")
+        );
+    });
+
+    test('Should get user data', async () => {
+        const twitchModel : FakeUserModel = new FakeUserModel();
+        const userLayer : UserLayer = new UserLayer(twitchModel);
+        const router : UserRouter = new UserRouter(userLayer);
+        router.setup();
+        const request : any = mockRequest({
+            params: {
+                userID: 1
+            }
+        });
+        const response : any = mockResponse();
+        twitchModel.addUser(1);
+
+        await router.handleGetUserByID(request, response);
+
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+        expect(response.json).toHaveBeenCalledWith(
+            new DataMessage(await twitchModel.getByID(1))
+        );
+    });
+});
+	

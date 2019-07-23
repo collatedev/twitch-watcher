@@ -1,10 +1,7 @@
-import Validatable from "../../src/validators/Validatable";
-
-export default class TestBody extends Validatable {
+export default class TestBody {
 	public a: boolean;
 
 	constructor(body: any) {
-		super();
 		this. a = body.a;
 	}
 }

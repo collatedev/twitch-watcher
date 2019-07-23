@@ -6,12 +6,7 @@ import mockRequest from '../mocks/MockRequest';
 import IRouteHandler from '../../src/routes/IRouteHandler';
 
 const Router : UserFollowedRouter = new UserFollowedRouter();
-
-describe("setup()", () => {
-	test('should setup the router', () => {
-		Router.setup();
-	});
-});
+Router.setup();
 
 describe("validate() [middleware]", () => {
 	test('Should fail to handle challenge', (done : any) => {

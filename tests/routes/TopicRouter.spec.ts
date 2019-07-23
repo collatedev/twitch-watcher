@@ -1,221 +1,232 @@
-import { use, expect } from 'chai';
-import 'mocha';
-import { mockReq, mockRes } from 'sinon-express-mock';
-import * as sinonChai from 'sinon-chai';
 import ErrorMessage from "../../src/messages/ErrorMessage";
-import TestTopicRouter from "../mocks/TestTopicRouter";
+import TestTopicRouter from "../fakes/TestTopicRouter";
 import DataMessage from '../../src/messages/DataMessage';
 import StatusCodes from '../../src/routes/StatusCodes';
-import TestBody from "../mocks/TestBody";
+import TestBody from "../fakes/TestBody";
+import mockResponse from '../mocks/MockResponse';
+import mockRequest from '../mocks/MockRequest';
+import IRouteHandler from "../../src/routes/IRouteHandler";
 
-use(sinonChai);
+describe("validate() [middleware]", () => {
+	test(`Should fail because the body is empty`, async (done : any) => {
+        const router : TestTopicRouter = new TestTopicRouter();
+        router.setup();
+        const request : any = mockRequest({});
+        const response : any = mockResponse();
+	
+		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "",
+						message: "Missing property 'query'",
+					}
+				])
+			);
+			done();
+		});
+	});
 
-describe('Topic Router', () => {
-	describe('setup', () => {
+	test('Should fail because hub.mode is missing', async (done : any) => {
 		const router : TestTopicRouter = new TestTopicRouter();
-		
-		try {
-			router.setup();
-		} catch(error) {
-			throw error;
-		}
-	});
-
-	describe('handleChallenge', () => {
-		it('Should fail because there the query is empty', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq();
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				"hub.topic": "http://test.com",
+				"hub.lease_seconds": 123,
+				"hub.challenge": "challenge token"
 			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.topic' it is either null or undefined")
-			);
 		});
+		const response : any = mockResponse();
 
-		it('Should fail because hub.mode is missing', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.topic": "value",
-					"hub.lease_seconds": 123,
-					"hub.challenge": "challenge token"
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.mode' it is either null or undefined")
+		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.mode'",
+					}
+				])
 			);
-		});
-
-		it('Should fail because hub.topic is missing', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.mode": "value",
-					"hub.lease_seconds": 123,
-					"hub.challenge": "challenge token"
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.topic' it is either null or undefined")
-			);
-		});
-
-		it('Should fail because hub.lease_seconds is missing', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.topic": "value",
-					"hub.mode": "value",
-					"hub.challenge": "challenge token"
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.lease_seconds' it is either null or undefined")
-			);
-		});
-
-		it('Should fail because hub.challenge is missing', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.topic": "value",
-					"hub.mode": "value",
-					"hub.lease_seconds": 123
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Challenge Query is missing property: 'hub.challenge' it is either null or undefined")
-			);
-		});
-
-		it('Should call send with challenge token', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				query: {
-					"hub.topic": "value",
-					"hub.mode": "value",
-					"hub.lease_seconds": 123,
-					"hub.challenge": "challenge_token"
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleChallenge(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-			expect(response.send).to.have.been.calledWith("challenge_token");
+			done();
 		});
 	});
 
-	describe('handleWebhookCall', () => {
-		it('Should fail because body is not valid', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq();
-			const response : any = mockRes();
-			router.failNextRequest();
-
-			try {
-				await router.handleWebhookCall(request, response);
-			} catch(error) {
-				throw error;
+	test('Should fail because hub.topic is missing', async (done : any) => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				"hub.mode": "subscribe",
+				"hub.lease_seconds": 123,
+				"hub.challenge": "challenge token"
 			}
+		});
+		const response : any = mockResponse();
 
-			expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-			expect(response.json).to.have.been.calledWith(
-				new ErrorMessage("Test Body has a null or undefined value on the 'a' field")
+		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.topic'",
+					}
+				])
 			);
+			done();
 		});
+	});
 
-		it('Should fail to process data', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				body: {
-					a: true
-				}
-			});
-			const response : any = mockRes();
-			router.failNextRequest();
-
-			try {
-				await router.handleWebhookCall(request, response);
-			} catch(error) {
-				throw error;
+	test('Should fail because hub.lease_seconds is missing', async (done : any) => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				"hub.topic": "http://test.com",
+				"hub.mode": "subscribe",
+				"hub.challenge": "challenge token"
 			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.InternalError);
-			expect(response.json).to.have.been.calledWith();
 		});
+		const response : any = mockResponse();
 
-		it('Should process data', async () => {
-			const router : TestTopicRouter = new TestTopicRouter();
-			const request : any = mockReq({
-				body: {
-					a: true
-				}
-			});
-			const response : any = mockRes();
-
-			try {
-				await router.handleWebhookCall(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-			expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-			expect(response.json).to.have.been.calledWith(
-				new DataMessage({
-					desc: `Recieved data under topic: /test`,
-					body: new TestBody({ a: true }),
-					processedData: true
-				})
+		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.lease_seconds'",
+					}
+				])
 			);
+			done();
 		});
+	});
+
+	test('Should fail because hub.challenge is missing', async (done : any) => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				"hub.topic": "http://test.com",
+				"hub.mode": "subscribe",
+				"hub.lease_seconds": 123
+			}
+		});
+		const response : any = mockResponse();
+
+		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query",
+						message: "Missing property 'hub.challenge'",
+					}
+				])
+			);
+			done();
+		});
+	});
+
+	test('Should fail because body is not valid', async (done : any) => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				a: {
+					
+				}
+			}
+		});
+		const response : any = mockResponse();
+
+		const middleWare : IRouteHandler = router.validate(router.getSchema());
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "query.a",
+						message: "Property 'a' should be type 'boolean'",
+					}
+				])
+			);
+			done();
+		});
+	});
+});
+
+describe('handleChallenge', () => {
+	test('Should call send with challenge token', async () => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			query: {
+				"hub.topic": "value",
+				"hub.mode": "value",
+				"hub.lease_seconds": 123,
+				"hub.challenge": "challenge_token"
+			}
+		});
+		const response : any = mockResponse();
+
+		await router.handleWebhookCall(request, response);
+
+		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+		expect(response.json).toHaveBeenCalledWith(new DataMessage({
+			desc: `Recieved data under topic: /test`,
+			body: undefined,
+			processedData: true
+		}));
+	});
+});
+
+describe('handleWebhookCall', () => {
+	test('Should fail to process data', async () => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			body: {
+				a: true
+			}
+		});
+		const response : any = mockResponse();
+		router.failNextRequest();
+
+		await router.handleWebhookCall(request, response);
+
+		expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+		expect(response.json).toHaveBeenCalledWith(new ErrorMessage("Failed to process webhook data"));
+	});
+
+	test('Should process data', async () => {
+		const router : TestTopicRouter = new TestTopicRouter();
+		router.setup();
+		const request : any = mockRequest({
+			body: {
+				a: true
+			}
+		});
+		const response : any = mockResponse();
+
+		await router.handleWebhookCall(request, response);
+
+		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+		expect(response.json).toHaveBeenCalledWith(
+			new DataMessage({
+				desc: `Recieved data under topic: /test`,
+				body: new TestBody({ a: true }),
+				processedData: true
+			})
+		);
 	});
 });

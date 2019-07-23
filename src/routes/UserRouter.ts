@@ -23,6 +23,10 @@ export default class UserRouter extends Router {
 	public async handleGetUserByID(request: Request, response: Response) : Promise<void> {
 		await this.getUserByID(response, parseInt(request.params.userID, 10));
 	}
+	
+	public getSchema() {
+		return new ValidationSchema(GetUserRequestSchema);
+	}
 
 	private async getUserByID(response: Response, userID: number) : Promise<void> {
 		try {

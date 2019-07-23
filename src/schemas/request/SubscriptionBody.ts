@@ -5,7 +5,6 @@ export default class SubscriptionBody implements ISubscriptionBody, ITwitchBody 
 	public readonly userID: number;
 
 	constructor(body: any) {
-		super();
 		this.userID = body.userID;
 	}
 }

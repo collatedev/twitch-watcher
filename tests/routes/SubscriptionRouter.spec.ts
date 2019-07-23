@@ -1,200 +1,150 @@
 import SubscriptionRouter from "../../src/routes/SubscriptionRouter";
-import { use, expect } from 'chai';
-import 'mocha';
-import FakeUserModel from "../mocks/FakeUserModel";
-import { mockReq, mockRes } from 'sinon-express-mock';
-import * as sinonChai from 'sinon-chai';
+import FakeUserModel from "../fakes/FakeUserModel";
 import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
-import FakeUserLayer from "../mocks/FakeUserLayer";
+import FakeUserLayer from "../fakes/FakeUserLayer";
 import TwitchUser from "../../src/schemas/user/TwitchUser";
-import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";
+import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";   
 import StatusCodes from "../../src/routes/StatusCodes";
+import mockResponse from '../mocks/mockResponse';
+import mockRequest from '../mocks/mockRequest';
+import IRouteHandler from "../../src/routes/IRouteHandler";
+import SubscriptonSchema from "../../api/SubscriptionRequest.json";
+import { ValidationSchema } from "@collate/request-validator";
 
-use(sinonChai);
-
-describe('Subscription Router', () => {
-	describe('setup', () => {
-		const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-		
-		try {
-			router.setup();
-		} catch(error) {
-			throw error;
-		}
-	});
-
-    describe('handleSubscription', () => {
-        it(`Should fail because the body is empty`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq();
-            const response : any = mockRes();
-
-            try {
-				await router.handleSubscription(request, response);
-			} catch (error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Subscription Body is missing property: 'userID' it is either null or undefined")
-            );
+describe("validate() [middleware]", () => {
+	test(`Should fail because the body is empty`, async (done : any) => {
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        router.setup();
+        const request : any = mockRequest({});
+        const response : any = mockResponse();
+	
+		const middleWare : IRouteHandler = router.validate(new ValidationSchema(SubscriptonSchema));
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "",
+						message: "Missing property 'body'",
+					}
+				])
+			);
+			done();
+		});
+    });
+    
+    test(`Should fail because the body does not contain a user ID`, async (done : any) => {
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        router.setup();
+        const request : any = mockRequest({
+            body: {
+                foo: "bar"
+            }
         });
+        const response : any = mockResponse();
 
-        it(`Should fail because the body does not contain a user ID`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                body: {
-                    callbackURL: "",
-                    topic: ""
-                }
-            });
-            const response : any = mockRes();
+        const middleWare : IRouteHandler = router.validate(new ValidationSchema(SubscriptonSchema));
+		middleWare(request, response, () => {
+			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+			expect(response.json).toHaveBeenCalledWith(
+				new ErrorMessage([
+					{
+						location: "body",
+						message: "Missing property 'userID'",
+                    },
+                    {
+						location: "body",
+						message: "Unexpected property 'foo'",
+					}
+				])
+			);
+			done();
+		});
+    });
+});
 
-            try {
-				await router.handleSubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Subscription Body is missing property: 'userID' it is either null or undefined")
-            );
+describe('handleSubscription', () => {
+    test(`Should fail because the userID is unknown`, async () => {
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        router.setup();
+        const request : any = mockRequest({
+            body: {
+                callbackURL: "callbackURL",
+                topic: "topic",
+                userID: 1
+            }
         });
+        const response : any = mockResponse();
 
-        it(`Should fail because the userID is unknown`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                body: {
-                    callbackURL: "callbackURL",
-                    topic: "topic",
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
+        await router.handleSubscription(request, response);
 
-            try {
-				await router.handleSubscription(request, response);
-			} catch (error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.InternalError);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Failed to subscribe user to webhook")
-            );
-        });
-
-        it(`Should get user information with the subscription updated`, async() => {
-            const userModel : FakeUserModel = new FakeUserModel();
-            userModel.addUser(1);
-            const router : any = new SubscriptionRouter(new FakeUserLayer(userModel));
-            const request : any = mockReq({
-                body: {
-                    callbackURL: "callbackURL",
-                    topic: "topic",
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
-            const expectedUser : TwitchUser = new TwitchUser(1);
-            expectedUser.followerHook = new TwitchWebhook("callbackURL", "topic", null);
-
-            try {
-				await router.handleSubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-            expect(response.json).to.have.been.calledWith(new DataMessage(expectedUser));
-        });
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage("Failed to subscribe user to webhook")
+        );
     });
 
-    describe('handleUnsubscription', () => {
-        it(`Should fail because the body is empty`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq();
-            const response : any = mockRes();
-
-            try {
-				await router.handleUnsubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Unsubscription Body has a null or undefined value on the 'userID' field")
-            );
+    test(`Should get user information with the subscription updated`, async() => {
+        const userModel : FakeUserModel = new FakeUserModel();
+        userModel.addUser(1);
+        const router : any = new SubscriptionRouter(new FakeUserLayer(userModel));
+        router.setup();
+        const request : any = mockRequest({
+            body: {
+                callbackURL: "callbackURL",
+                topic: "topic",
+                userID: 1
+            }
         });
+        const response : any = mockResponse();
+        const expectedUser : TwitchUser = new TwitchUser(1);
+        expectedUser.followerHook = new TwitchWebhook("callbackURL", "topic", null);
 
-        it(`Should fail because the body does not contain a user ID`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                body: {
-                    topic: ""
-                }
-            });
-            const response : any = mockRes();
+        await router.handleSubscription(request, response);
 
-            try {
-				await router.handleUnsubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+        expect(response.json).toHaveBeenCalledWith(new DataMessage(expectedUser));
+    });
+});
 
-            expect(response.status).to.have.been.calledWith(StatusCodes.BadRequest);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Unsubscription Body has a null or undefined value on the 'userID' field")
-            );
+describe('handleUnsubscription', () => {
+    test(`Should fail because the userID is unknown`, async () => {
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        router.setup();
+        const request : any = mockRequest({
+            body: {
+                topic: "topic",
+                userID: 1
+            }
         });
+        const response : any = mockResponse();
 
-        it(`Should fail because the userID is unknown`, async () => {
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
-            const request : any = mockReq({
-                body: {
-                    topic: "topic",
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
+        await router.handleUnsubscription(request, response);
 
-            try {
-				await router.handleUnsubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage("Failed to unsubscribe user from webhook")
+        );
+    });
 
-            expect(response.status).to.have.been.calledWith(StatusCodes.InternalError);
-            expect(response.json).to.have.been.calledWith(
-                new ErrorMessage("Failed to unsubscribe user from webhook")
-            );
+    test(`Should get user information with the subscription updated`, async() => {
+        const userModel : FakeUserModel = new FakeUserModel();
+        userModel.addUser(1);
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(userModel));
+        router.setup();
+        const request : any = mockRequest({
+            body: {
+                topic: "topic",
+                userID: 1
+            }
         });
+        const response : any = mockResponse();
+        const expectedUser : TwitchUser = new TwitchUser(1);
 
-        it(`Should get user information with the subscription updated`, async() => {
-            const userModel : FakeUserModel = new FakeUserModel();
-            userModel.addUser(1);
-            const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(userModel));
-            const request : any = mockReq({
-                body: {
-                    topic: "topic",
-                    userID: 1
-                }
-            });
-            const response : any = mockRes();
-            const expectedUser : TwitchUser = new TwitchUser(1);
+        await router.handleUnsubscription(request, response);
 
-            try {
-				await router.handleUnsubscription(request, response);
-			} catch(error) {
-				throw error;
-			}
-
-            expect(response.status).to.have.been.calledWith(StatusCodes.OK);
-            expect(response.json).to.have.been.calledWith(new DataMessage(expectedUser));
-        });
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+        expect(response.json).toHaveBeenCalledWith(new DataMessage(expectedUser));
     });
 });

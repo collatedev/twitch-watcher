@@ -5,7 +5,6 @@ export default class StreamBody implements IStreamBody {
 	public readonly data: IStreamData[];
 
 	constructor(body: any) {
-		super();
 		this.data = body.data;
 	}
 }
