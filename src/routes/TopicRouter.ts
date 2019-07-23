@@ -3,60 +3,38 @@ import { Request, Response } from "express";
 import ChallengeQuery from "../schemas/request/ChallengeQuery";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../logging/Winston";
-import IValidatable from "../validators/IValidatable";
-import IValidator from "../validators/IValidator";
+import { IValidationSchema, ValidationSchema } from "@collate/request-validator";
+import WebhookChallengeRequestSchema from "../../api/WebhookChallengeRequest.json";
 
-export default abstract class TopicRouter<T extends IValidatable> extends Router {
-    private hookDataValidator: IValidator<T>;
-    private topic : string;
+export default abstract class TopicRouter extends Router {
+	private topic : string;
+	private schema : IValidationSchema;
 
-    constructor(topic: string, validator: IValidator<T>) {
-        super(`/topic`);
+    constructor(topic: string, schema : IValidationSchema) {
+		super(`/topic`);
+		this.schema = schema;
         this.topic = topic;
         this.handleChallenge = this.handleChallenge.bind(this);
         this.handleWebhookCall = this.handleWebhookCall.bind(this);
-        this.hookDataValidator = validator;
     }
 
     public setup() : void {
-        this.router.get(this.topic, this.handleChallenge);
-        this.router.post(this.topic, this.handleWebhookCall);
+        this.get(this.topic, this.handleChallenge, new ValidationSchema(WebhookChallengeRequestSchema));
+        this.post(this.topic, this.handleWebhookCall, this.schema);
     }
 
     public async handleChallenge(request: Request, response: Response) : Promise<void> {
-		const body : ChallengeQuery = new ChallengeQuery(request.query);
-        if (!ChallengeQuery.Validator.isValid(body)) {
-            Logger.error(
-				`Did Twitch challenge data change? Or has Twitch Services failed? body: ${JSON.stringify(body)}`
-			);
-            ChallengeQuery.Validator.sendError(response, body);
-        } else {
-			response.send(body["hub.challenge"]).status(StatusCodes.OK);
-		}
+        response.send(new ChallengeQuery(request.query)["hub.challenge"]).status(StatusCodes.OK);
 	}
     
 
     public async handleWebhookCall(request: Request, response: Response) : Promise<void> {
-        const body : T = this.getBody(request.body);
-        if (!this.hookDataValidator.isValid(body)) {
-            Logger.error(
-				`Did Twitch ${this.topic} data schema change? Has Twitch Services failed? Does our schema not match Twitch?`
-			);
-            this.hookDataValidator.sendError(response, body);
-        } else {
-			await this.processWebhook(response, body);
-		}
-	}
-
-	protected abstract getBody(body: any) : T;
-	
-	private async processWebhook(response: Response, body: T) : Promise<void> {
-		try {
-			await this.handleWebhookData(body);
+        try {
+			await this.handleWebhookData(request.body);
 			Logger.info(`Successfuly processed webhook at topic: '${this.topic}'`);
 			this.sendData(response, {
 				desc: `Recieved data under topic: ${this.topic}`,
-				body,
+				body: request.body,
 				processedData: true,
 			}, StatusCodes.OK);
 		} catch (error) {
@@ -65,5 +43,5 @@ export default abstract class TopicRouter<T extends IValidatable> extends Router
 		}
 	}
 
-    protected abstract async handleWebhookData(body: T): Promise<void>;
+    protected abstract async handleWebhookData(rawBody: any): Promise<void>;
 }

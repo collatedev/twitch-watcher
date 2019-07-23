@@ -6,6 +6,8 @@ import { Logger } from "../logging/Winston";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
+import SubscriptionRequestSchema from '../../api/SubscriptionRequest.json';
+import { ValidationSchema } from "@collate/request-validator";
 
 export default class SubscriptionRouter extends Router {
     private userLayer : UserLayer;
@@ -19,24 +21,18 @@ export default class SubscriptionRouter extends Router {
     }
 
     public setup(): void {
-        this.router.post('/subscribe', this.handleSubscription);
-        this.router.post('/unsubscribe', this.handleUnsubscription);
+        this.post('/subscribe', this.handleSubscription, new ValidationSchema(SubscriptionRequestSchema));
+        this.post('/unsubscribe', this.handleUnsubscription, new ValidationSchema(SubscriptionRequestSchema));
     }
 
     public async handleSubscription(request: Request, response: Response) : Promise<void> {
-        const body : SubscriptionBody = new SubscriptionBody(request.body);
-        if (!SubscriptionBody.Validator.isValid(body)) {
-            Logger.error(`Invalid subscribe body: ${JSON.stringify(body)}`);
-            SubscriptionBody.Validator.sendError(response, body);
-        } else {
-			await this.subscribeToWebhook(response, body);
-		}
+        await this.subscribeToWebhook(response, new SubscriptionBody(request.body));
 	}
 	
-	private async subscribeToWebhook(response: Response, body: SubscriptionBody) : Promise<void> {
+	private async subscribeToWebhook(response: Response, subscriptionData: SubscriptionBody) : Promise<void> {
 		try {
-            const user : TwitchUser = await this.userLayer.subscribe(body);
-            Logger.info(`successfully subscribed user (id=${body.userID}) to webhooks`);
+            const user : TwitchUser = await this.userLayer.subscribe(subscriptionData);
+            Logger.info(`successfully subscribed user (id=${subscriptionData.userID}) to webhooks`);
             this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error);
@@ -45,19 +41,13 @@ export default class SubscriptionRouter extends Router {
 	}
 
     public async handleUnsubscription(request: Request, response: Response) : Promise<void> {
-        const body : UnsubscriptionBody = new UnsubscriptionBody(request.body);
-        if (!UnsubscriptionBody.Validator.isValid(body)) {
-            Logger.error(`Invalid unsubscribe body: ${JSON.stringify(body)}`);
-            return UnsubscriptionBody.Validator.sendError(response, body);
-        } else {
-			await this.unsubscribeFromWebhook(response, body);
-		}
+        await this.unsubscribeFromWebhook(response, new SubscriptionBody(request.body));
 	}
 	
-	private async unsubscribeFromWebhook(response: Response, body: SubscriptionBody) : Promise<void> {
+	private async unsubscribeFromWebhook(response: Response, unsubscriptionData: UnsubscriptionBody) : Promise<void> {
 		try {
-            const user : TwitchUser = await this.userLayer.unsubscribe(body);
-            Logger.info(`successfully unsubscribed user (id=${body.userID}) from webhooks`);
+            const user : TwitchUser = await this.userLayer.unsubscribe(unsubscriptionData);
+            Logger.info(`successfully unsubscribed user (id=${unsubscriptionData.userID}) from webhooks`);
             this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
             Logger.error(error);

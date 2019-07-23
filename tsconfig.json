@@ -14,7 +14,9 @@
 		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": true,
 		"strictPropertyInitialization": true,
-		"strictNullChecks": true
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
     },
     "include": [
         "src/**/*"

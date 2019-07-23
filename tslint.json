@@ -27,6 +27,6 @@
 		"max-line-length": [true, 120],
 		"semicolon": true,
 		"no-null-keyword": false
-    },
+	},
     "rulesDirectory": []
 }

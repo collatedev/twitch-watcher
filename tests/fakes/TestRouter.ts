@@ -1,6 +1,7 @@
 import Router from "../../src/routes/Router";
 import { Response, Request } from "express";
 import StatusCodes from "../../src/routes/StatusCodes";
+import { ValidationSchema } from "@collate/request-validator";
 
 export default class TestRouter extends Router {
 	constructor() {
@@ -8,8 +9,17 @@ export default class TestRouter extends Router {
 	}
 
 	public setup(): void {
-		this.router.get('/a', (response: Response, request: Request): void => {
+		this.get('/a', (request: Request, response: Response): void => {
 			response.send("test").status(StatusCodes.OK);
-		});
+		}, new ValidationSchema({
+			types: {
+				request: {
+					body: {
+						type: "string",
+						required: true
+					}
+				}
+			}
+		}));
 	}
 }

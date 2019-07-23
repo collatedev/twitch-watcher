@@ -1,17 +1,14 @@
 import TopicRouter from "./TopicRouter";
 import { Logger } from "../logging/Winston";
-import FollowBody from "../schemas/request/FollowBody";
+import UserFollowRequestSchema from "../../api/UserFollowRequest.json";
+import { ValidationSchema } from "@collate/request-validator";
 
-export default class NewFollowerRouter extends TopicRouter<FollowBody> {	
+export default class NewFollowerRouter extends TopicRouter {	
     constructor() {
-		super('/follow/new', FollowBody.Validator);
+		super('/follow/new', new ValidationSchema(UserFollowRequestSchema));
     }
 
-    protected async handleWebhookData(body: FollowBody): Promise<void> {
-		Logger.info(`New Follower webhook recieved body: ${JSON.stringify(body)}`);
-	}
-	
-	protected getBody(body: any) : FollowBody {
-		return new FollowBody(body);
+    protected async handleWebhookData(rawBody: any): Promise<void> {
+		Logger.info(`New Follower webhook recieved body: ${JSON.stringify(rawBody)}`);
 	}
 }

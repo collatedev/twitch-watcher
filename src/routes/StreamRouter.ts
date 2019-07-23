@@ -1,17 +1,14 @@
 import TopicRouter from "./TopicRouter";
 import { Logger } from "../logging/Winston";
-import StreamBody from "../schemas/request/StreamBody";
+import StreamRequestSchema from "../../api/StreamRequest.json";
+import { ValidationSchema } from "@collate/request-validator";
 
-export default class StreamRouter extends TopicRouter<StreamBody> {	
+export default class StreamRouter extends TopicRouter {	
     constructor() {
-		super('/streams', StreamBody.Validator);
+		  super('/streams', new ValidationSchema(StreamRequestSchema));
     }
 
-    protected async handleWebhookData(body: StreamBody): Promise<void> {
-		Logger.info(`Stream webhook recieved body: ${JSON.stringify(body)}`);
-	}
-	
-	protected getBody(body: any) : StreamBody {
-		return new StreamBody(body);
+    protected async handleWebhookData(rawBody: any): Promise<void> {
+		Logger.info(`Stream webhook recieved body: ${JSON.stringify(rawBody)}`);
 	}
 }

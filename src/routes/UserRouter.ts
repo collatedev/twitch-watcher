@@ -4,6 +4,8 @@ import UserLayer from "../layers/UserLayer";
 import StatusCodes from "./StatusCodes";
 import { Logger } from "../logging/Winston";
 import TwitchUser from "../schemas/user/TwitchUser";
+import { ValidationSchema } from "@collate/request-validator";
+import GetUserRequestSchema from "../../api/GetUserRequest.json";
 
 export default class UserRouter extends Router {
 	private userLayer : UserLayer;
@@ -15,21 +17,11 @@ export default class UserRouter extends Router {
 	}
 
 	public setup() : void {
-		this.router.get('/:userID', this.handleGetUserByID);
+		this.get('/:userID', this.handleGetUserByID, new ValidationSchema(GetUserRequestSchema));
 	}
 
 	public async handleGetUserByID(request: Request, response: Response) : Promise<void> {
-		const userID : number = parseFloat(request.params.userID);
-		if (!this.isValidID(userID)) {
-			Logger.error(`Illegal userID: '${userID}'`);
-			this.sendError(
-				response, 
-				`The Twitch User ID must be a positive integer value, instead received '${userID}'`, 
-				StatusCodes.BadRequest
-			);
-		} else {
-			await this.getUserByID(response, userID);
-		}
+		await this.getUserByID(response, parseInt(request.params.userID, 10));
 	}
 
 	private async getUserByID(response: Response, userID: number) : Promise<void> {
@@ -41,13 +33,5 @@ export default class UserRouter extends Router {
 			Logger.error(error);
 			this.sendError(response, `Failed to get user with id: ${userID}`, StatusCodes.NotFound);
 		}
-	}
-	
-	private isValidID(userID: number) : boolean {
-		return !isNaN(userID) && this.isInt(userID) && userID > -1;
-	}
-
-	private isInt(n: number) : boolean {
-		return n % 1 === 0;
 	}
 }

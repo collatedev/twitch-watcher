@@ -1,17 +1,14 @@
 import TopicRouter from "./TopicRouter";
 import { Logger } from "../logging/Winston";
-import TwitchProfileUpdateBody from "../schemas/request/TwitchProfileUpdateBody";
+import TwitchProfileUpdateRequestSchema from "../../api/TwitchProfileUpdateRequest.json";
+import { ValidationSchema } from "@collate/request-validator";
 
-export default class TwitchProfileUpdateRouter extends TopicRouter<TwitchProfileUpdateBody> {	
+export default class TwitchProfileUpdateRouter extends TopicRouter {	
     constructor() {
-		super('/user', TwitchProfileUpdateBody.Validator);
+		super('/user', new ValidationSchema(TwitchProfileUpdateRequestSchema));
     }
 
-    protected async handleWebhookData(body: TwitchProfileUpdateBody): Promise<void> {
-		Logger.info(`Twitch Profile Update webhook recieved body: ${JSON.stringify(body)}`);
-	}
-	
-	protected getBody(body: any) : TwitchProfileUpdateBody {
-		return new TwitchProfileUpdateBody(body);
+    protected async handleWebhookData(rawBody: any): Promise<void> {
+		Logger.info(`Twitch Profile Update webhook recieved body: ${JSON.stringify(rawBody)}`);
 	}
 }

@@ -7,7 +7,7 @@ export default interface IStreamData {
 	type: string;
 	title: string;
 	viewer_count: number;
-	started_at: Date;
+	started_at: string;
 	language: string;
 	thumbnail_url: string;
 }
