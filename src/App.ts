@@ -1,14 +1,16 @@
-import * as Express from "express";
+import Express from "express";
 import * as BodyParser from "body-parser";
 import IRouter from "./routes/IRouter";
-import * as morgan from "morgan";
-import {Stream, Logger} from "./logging/Winston";
+import morgan from "morgan";
+import { ILogger } from "@collate/logging";
 
 export default class App {
     public app: Express.Application;
+    private logger : ILogger;
 
-    constructor() {
+    constructor(logger : ILogger) {
         this.app = Express();
+        this.logger = logger;
     }
 
     public initialize() : void {
@@ -17,12 +19,19 @@ export default class App {
             extended: false
         }));
         
-        this.app.use(morgan('combined', { stream: Stream }));
+        const streamOptions : morgan.StreamOptions = {
+            write: (message: string): void => {
+                // use the 'info' log level so the output will be picked up by both transports (file and console)
+                this.logger.info(message);
+            },
+        };
+
+        this.app.use(morgan('combined', { stream: streamOptions }));
     }
 
     public start(port: number) : void {
         this.app.listen(port, () : void => {
-            Logger.info(`Server is listening on port ${port}`);
+            this.logger.info(`Server is listening on port ${port}`);
         });
     }
 

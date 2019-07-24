@@ -2,12 +2,16 @@ import TopicRouter from "../../src/routes/TopicRouter";
 import TestBody from "./TestBody";
 import { ValidationSchema } from "@collate/request-validator";
 import TestTopicSchema from "../api/TestTopic.json";
+import FakeLogger from "../fakes/FakeLogger";
+import { ILogger } from "@collate/logging";
+
+const logger : ILogger = new FakeLogger();
 
 export default class TestTopicRouter extends TopicRouter {    
     private shouldFail: boolean;
 
     constructor() {
-		super('/test', new ValidationSchema(TestTopicSchema));
+		super('/test', new ValidationSchema(TestTopicSchema), logger);
 		this.shouldFail = false;
     }
 

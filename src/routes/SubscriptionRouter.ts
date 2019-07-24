@@ -2,18 +2,18 @@ import Router from "./Router";
 import { Request, Response } from "express";
 import UserLayer from "../layers/UserLayer";
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
-import { Logger } from "../logging/Winston";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
-import SubscriptionRequestSchema from '../../api/SubscriptionRequest.json';
+import SubscriptionRequestSchema from '../api/SubscriptionRequest.json';
 import { ValidationSchema } from "@collate/request-validator";
+import { ILogger } from "@collate/logging";
 
 export default class SubscriptionRouter extends Router {
     private userLayer : UserLayer;
 
-    constructor(userLayer: UserLayer) {
-        super('/user/subscriptions');
+    constructor(userLayer: UserLayer, logger : ILogger) {
+        super('/user/subscriptions', logger);
         this.userLayer = userLayer;
 
         this.handleSubscription = this.handleSubscription.bind(this);
@@ -32,10 +32,10 @@ export default class SubscriptionRouter extends Router {
 	private async subscribeToWebhook(response: Response, subscriptionData: SubscriptionBody) : Promise<void> {
 		try {
             const user : TwitchUser = await this.userLayer.subscribe(subscriptionData);
-            Logger.info(`successfully subscribed user (id=${subscriptionData.userID}) to webhooks`);
+            this.logger.info(`successfully subscribed user (id=${subscriptionData.userID}) to webhooks`);
             this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
-            Logger.error(error);
+            this.logger.error(error);
             this.sendError(response, "Failed to subscribe user to webhook", StatusCodes.InternalError);
         }
 	}
@@ -47,10 +47,10 @@ export default class SubscriptionRouter extends Router {
 	private async unsubscribeFromWebhook(response: Response, unsubscriptionData: UnsubscriptionBody) : Promise<void> {
 		try {
             const user : TwitchUser = await this.userLayer.unsubscribe(unsubscriptionData);
-            Logger.info(`successfully unsubscribed user (id=${unsubscriptionData.userID}) from webhooks`);
+            this.logger.info(`successfully unsubscribed user (id=${unsubscriptionData.userID}) from webhooks`);
             this.sendData(response, user, StatusCodes.OK);
         } catch (error) {
-            Logger.error(error);
+            this.logger.error(error);
             this.sendError(response, "Failed to unsubscribe user from webhook", StatusCodes.InternalError);
         }
 	}

@@ -4,7 +4,7 @@ import TwitchResponse from "./TwitchResponse";
 import TwitchOAuthBearer from "../schemas/request/TwitchOAuthBearer";
 import ITwitchRequestBody from "./ITwitchRequestBody";
 import IRequestBuilder from "../request_builder/IRequestBuilder";
-import TwitchOAuthBearerSchema from "../../api/TwitchOAuthBearer.json";
+import TwitchOAuthBearerSchema from "../api/TwitchOAuthBearer.json";
 import { 
 	ValidationSchema, 
 	IValidationResult, 

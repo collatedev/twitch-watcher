@@ -1,9 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-// tslint:disable-next-line: no-duplicate-imports
 import * as Express from "express";
 import IRouter from "./IRouter";
 import * as Path from "path";
-// import ErrorMessage from "../messages/ErrorMessage";
+import { ILogger } from "@collate/logging";
 import DataMessage from "../messages/DataMessage";
 import IRouteHandler from "./IRouteHandler";
 import { 
@@ -25,11 +23,13 @@ export default abstract class Router implements IRouter {
     private router : Express.Router;
     private basePath : string;
     private requestBuilder : IRequestBuilder;
+    protected logger : ILogger;
 
-    constructor(path: string) {
+    constructor(path: string, logger : ILogger) {
         this.basePath = path;
         this.router = Express.Router();
         this.requestBuilder = new RequestBuilder();
+        this.logger = logger;
     }
 
     public getPath() : string {
@@ -61,7 +61,11 @@ export default abstract class Router implements IRouter {
     }
 
     public validate(schema : IValidationSchema) : IRouteHandler {
-        return (request : Request, response : Response, next? : NextFunction) : void => {
+        return (
+            request : Express.Request, 
+            response : Express.Response, 
+            next? : Express.NextFunction
+        ) : void => {
             const requestSchema : IValidationSchema = schema;
 
             if (!this.isEmpty(request.body)) {

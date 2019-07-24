@@ -7,6 +7,8 @@ export default class TwitchCallbackURL {
     public static async getCallbackURL() : Promise<string> {
         if (process.env.NODE_ENV === 'production') {
             return this.localhostCallbackURL;
+        } else if (process.env.NODE_ENV === 'test') {
+            return "endpoint_url";
         } else {
             return `${await Ngrok.getURL()}/api/v1/topic`;
         }

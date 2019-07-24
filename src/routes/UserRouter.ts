@@ -2,16 +2,16 @@ import Router from "./Router";
 import { Response, Request } from "express";
 import UserLayer from "../layers/UserLayer";
 import StatusCodes from "./StatusCodes";
-import { Logger } from "../logging/Winston";
 import TwitchUser from "../schemas/user/TwitchUser";
-import { ValidationSchema } from "@collate/request-validator";
-import GetUserRequestSchema from "../../api/GetUserRequest.json";
+import { ValidationSchema, IValidationSchema } from "@collate/request-validator";
+import GetUserRequestSchema from "../api/GetUserRequest.json";
+import { ILogger } from "@collate/logging";
 
 export default class UserRouter extends Router {
 	private userLayer : UserLayer;
 	
-	constructor(userLayer: UserLayer) {
-		super('/user');
+	constructor(userLayer: UserLayer, logger : ILogger) {
+		super('/user', logger);
 		this.userLayer = userLayer; 
 		this.handleGetUserByID = this.handleGetUserByID.bind(this);
 	}
@@ -24,17 +24,17 @@ export default class UserRouter extends Router {
 		await this.getUserByID(response, parseInt(request.params.userID, 10));
 	}
 	
-	public getSchema() {
+	public getSchema() : IValidationSchema {
 		return new ValidationSchema(GetUserRequestSchema);
 	}
 
 	private async getUserByID(response: Response, userID: number) : Promise<void> {
 		try {
 			const user : TwitchUser = await this.userLayer.getUserInfo(userID);
-			Logger.info(`Successfully got user: ${JSON.stringify(user)}`);
+			this.logger.info(`Successfully got user: ${JSON.stringify(user)}`);
 			this.sendData(response, user, StatusCodes.OK);
 		} catch (error) {
-			Logger.error(error);
+			this.logger.error(error);
 			this.sendError(response, `Failed to get user with id: ${userID}`, StatusCodes.NotFound);
 		}
 	}

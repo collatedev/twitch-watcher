@@ -4,8 +4,12 @@ import StatusCodes from '../../src/routes/StatusCodes';
 import mockResponse from '../mocks/MockResponse';
 import mockRequest from '../mocks/MockRequest';
 import IRouteHandler from '../../src/routes/IRouteHandler';
+import FakeLogger from "../fakes/FakeLogger";
+import { ILogger } from "@collate/logging";
 
-const Router : NewFollowerRouter = new NewFollowerRouter();
+const logger : ILogger = new FakeLogger();
+
+const Router : NewFollowerRouter = new NewFollowerRouter(logger);
 Router.setup();
 
 describe("validate() [middleware]", () => {

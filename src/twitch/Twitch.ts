@@ -2,7 +2,6 @@ import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import * as Dotenv from 'dotenv';
 import SubscribeRequest from './SubscribeRequest';
 import TwitchRequest from './TwitchRequest';
-import { Logger } from '../logging/Winston';
 import TwitchResponse from './TwitchResponse';
 import TwitchSubscription from './TwitchSubscription';
 import HTTPRequestBuilder from '../request_builder/HTTPRequestBuilder';
@@ -10,6 +9,7 @@ import IRequestBuilder from "../request_builder/IRequestBuilder";
 import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
 import TwitchCallbackURL from "./TwitchCallbackURL";
+import { ILogger, Logger } from "@collate/logging";
 
 Dotenv.config();
 
@@ -19,13 +19,14 @@ type PendingTwitchResponse = Promise<TwitchResponse>;
 
 export default class Twitch {
 	public static RequestBuilder : IRequestBuilder = new HTTPRequestBuilder();
+	public static Logger : ILogger = new Logger('info', 'twitch.log');
 
 	public static async subscribe(body: SubscriptionBody) : Promise<void> {
 		try {
 			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
 			const requests : SubscribeRequest[] = this.getRequests(body, callbackURL);
 			await this.makeRequests(requests);
-			Logger.info(
+			this.Logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${body.userID}) to all webhooks`
 			);	
 		} catch (error) {

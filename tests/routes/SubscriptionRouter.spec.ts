@@ -9,12 +9,19 @@ import StatusCodes from "../../src/routes/StatusCodes";
 import mockResponse from '../mocks/mockResponse';
 import mockRequest from '../mocks/mockRequest';
 import IRouteHandler from "../../src/routes/IRouteHandler";
-import SubscriptonSchema from "../../api/SubscriptionRequest.json";
+import SubscriptonSchema from "../../src/api/SubscriptionRequest.json";
 import { ValidationSchema } from "@collate/request-validator";
+import FakeLogger from "../fakes/FakeLogger";
+import { ILogger } from "@collate/logging";
+
+const logger : ILogger = new FakeLogger();
 
 describe("validate() [middleware]", () => {
 	test(`Should fail because the body is empty`, async (done : any) => {
-        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        const router : SubscriptionRouter = new SubscriptionRouter(
+            new FakeUserLayer(new FakeUserModel()), 
+            logger
+        );
         router.setup();
         const request : any = mockRequest({});
         const response : any = mockResponse();
@@ -35,7 +42,10 @@ describe("validate() [middleware]", () => {
     });
     
     test(`Should fail because the body does not contain a user ID`, async (done : any) => {
-        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        const router : SubscriptionRouter = new SubscriptionRouter(
+            new FakeUserLayer(new FakeUserModel()),
+            logger
+        );
         router.setup();
         const request : any = mockRequest({
             body: {
@@ -66,7 +76,10 @@ describe("validate() [middleware]", () => {
 
 describe('handleSubscription', () => {
     test(`Should fail because the userID is unknown`, async () => {
-        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        const router : SubscriptionRouter = new SubscriptionRouter(
+            new FakeUserLayer(new FakeUserModel()),
+            logger
+        );
         router.setup();
         const request : any = mockRequest({
             body: {
@@ -88,7 +101,7 @@ describe('handleSubscription', () => {
     test(`Should get user information with the subscription updated`, async() => {
         const userModel : FakeUserModel = new FakeUserModel();
         userModel.addUser(1);
-        const router : any = new SubscriptionRouter(new FakeUserLayer(userModel));
+        const router : any = new SubscriptionRouter(new FakeUserLayer(userModel), logger);
         router.setup();
         const request : any = mockRequest({
             body: {
@@ -110,7 +123,10 @@ describe('handleSubscription', () => {
 
 describe('handleUnsubscription', () => {
     test(`Should fail because the userID is unknown`, async () => {
-        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(new FakeUserModel()));
+        const router : SubscriptionRouter = new SubscriptionRouter(
+            new FakeUserLayer(new FakeUserModel()),
+            logger
+        );
         router.setup();
         const request : any = mockRequest({
             body: {
@@ -130,8 +146,8 @@ describe('handleUnsubscription', () => {
 
     test(`Should get user information with the subscription updated`, async() => {
         const userModel : FakeUserModel = new FakeUserModel();
+        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(userModel), logger);
         userModel.addUser(1);
-        const router : SubscriptionRouter = new SubscriptionRouter(new FakeUserLayer(userModel));
         router.setup();
         const request : any = mockRequest({
             body: {
