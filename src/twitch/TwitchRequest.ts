@@ -13,8 +13,9 @@ import {
 	IValidationSchema,
 	Validatable
 } from "@collate/request-validator";
+import ITwitchResponse from "./ITwitchResponse";
 
-type TwitchResolver = (response: TwitchResponse) => void;
+type TwitchResolver = (response: ITwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
 
 export default abstract class TwitchRequest implements ITwitchRequest {
@@ -33,8 +34,8 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 		this.buildRequest = this.buildRequest.bind(this);
 	}
 
-	public async send(): Promise<TwitchResponse> {
-		return new Promise<TwitchResponse>(this.buildRequest);
+	public async send(): Promise<ITwitchResponse> {
+		return new Promise<ITwitchResponse>(this.buildRequest);
 	}
 
 	private async buildRequest(resolve: TwitchResolver, reject: TwitchRejector) : Promise<void> {

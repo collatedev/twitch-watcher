@@ -1,7 +1,6 @@
 import TopicRouter from "../../src/routes/TopicRouter";
 import TestBody from "./TestBody";
-import { ValidationSchema } from "@collate/request-validator";
-import TestTopicSchema from "../api/TestTopic.json";
+import { IValidationSchema } from "@collate/request-validator";
 import FakeLogger from "../fakes/FakeLogger";
 import { ILogger } from "@collate/logging";
 
@@ -10,8 +9,8 @@ const logger : ILogger = new FakeLogger();
 export default class TestTopicRouter extends TopicRouter {    
     private shouldFail: boolean;
 
-    constructor() {
-		super('/test', new ValidationSchema(TestTopicSchema), logger);
+    constructor(schema : IValidationSchema) {
+		super('/test', schema, logger);
 		this.shouldFail = false;
     }
 

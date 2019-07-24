@@ -6,15 +6,21 @@ import TestBody from "../fakes/TestBody";
 import mockResponse from '../mocks/MockResponse';
 import mockRequest from '../mocks/MockRequest';
 import IRouteHandler from "../../src/routes/IRouteHandler";
+import ChallengeQueryRequestSchema from '../../src/api/WebhookChallengeRequest.json';
+import TopicTestRequestSchema from '../api/TestTopic.json';
+import { ValidationSchema, IValidationSchema } from "@collate/request-validator";
+
+const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
+const TopicTestSchema : IValidationSchema = new ValidationSchema(TopicTestRequestSchema);
 
 describe("validate() [middleware]", () => {
 	test(`Should fail because the body is empty`, async (done : any) => {
-        const router : TestTopicRouter = new TestTopicRouter();
+        const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
         router.setup();
         const request : any = mockRequest({});
         const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -30,7 +36,7 @@ describe("validate() [middleware]", () => {
 	});
 
 	test('Should fail because hub.mode is missing', async (done : any) => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -41,7 +47,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -57,7 +63,7 @@ describe("validate() [middleware]", () => {
 	});
 
 	test('Should fail because hub.topic is missing', async (done : any) => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -68,7 +74,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -84,7 +90,7 @@ describe("validate() [middleware]", () => {
 	});
 
 	test('Should fail because hub.lease_seconds is missing', async (done : any) => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -95,7 +101,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -111,7 +117,7 @@ describe("validate() [middleware]", () => {
 	});
 
 	test('Should fail because hub.challenge is missing', async (done : any) => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -122,7 +128,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(router.getChallengeSchema());
+		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -138,7 +144,7 @@ describe("validate() [middleware]", () => {
 	});
 
 	test('Should fail because body is not valid', async (done : any) => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -149,7 +155,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(router.getSchema());
+		const middleWare : IRouteHandler = router.validate(TopicTestSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(
@@ -167,7 +173,7 @@ describe("validate() [middleware]", () => {
 
 describe('handleChallenge', () => {
 	test('Should call send with challenge token', async () => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			query: {
@@ -192,7 +198,7 @@ describe('handleChallenge', () => {
 
 describe('handleWebhookCall', () => {
 	test('Should fail to process data', async () => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			body: {
@@ -209,7 +215,7 @@ describe('handleWebhookCall', () => {
 	});
 
 	test('Should process data', async () => {
-		const router : TestTopicRouter = new TestTopicRouter();
+		const router : TestTopicRouter = new TestTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
 			body: {

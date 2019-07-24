@@ -1,4 +1,4 @@
-import Twitch from "../../src/twitch/Twitch";
+import TwitchService from "../../src/twitch/TwitchService";
 import FakeRequesetBuilder from "../fakes/FakeRequestBuilder";
 import SubscriptionBody from '../../src/schemas/request/SubscriptionBody';
 import { Response } from 'node-fetch';
@@ -27,7 +27,7 @@ describe('subscribe', () => {
 		queueBearerResponse(requestBuilder);
 		queueAuthorizationResponses(requestBuilder, StatusCodes.Accepted);
 
-		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
+		const twitch : TwitchService = new TwitchService(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
 		
 		await twitch.subscribe(new SubscriptionBody({
 			callbackURL: "",
@@ -40,7 +40,7 @@ describe('subscribe', () => {
 		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
 		queueBearerResponse(requestBuilder);
 		queueAuthorizationResponses(requestBuilder, StatusCodes.BadRequest);
-		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("secret"), new FakeLogger());
+		const twitch : TwitchService = new TwitchService(requestBuilder, new FakeSecretGenerator("secret"), new FakeLogger());
 
 		await expect(twitch.subscribe(
 			new SubscriptionBody({
@@ -58,7 +58,7 @@ describe('subscribe', () => {
 		process.env.NODE_ENV = "test";
 		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
 		queueBearerResponse(requestBuilder);
-		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
+		const twitch : TwitchService = new TwitchService(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
 
 		await expect(twitch.subscribe(
 			new SubscriptionBody({

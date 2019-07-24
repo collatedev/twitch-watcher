@@ -1,6 +1,8 @@
+import ISecretGenerator from "./ISecretGenerator";
+
 const DefaultAlphabet: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
 
-export default class SecretGenerator {
+export default class SecretGenerator implements ISecretGenerator {
 	private alphabet: string;
 
 	constructor(alphabet? : string) {
@@ -11,7 +13,7 @@ export default class SecretGenerator {
 		}
 	}
 
-	public generateSecret(length: number) : string {
+	public generate(length: number) : string {
 		let secret : string = "";
 		for (let i : number = 0; i < length; i++) {
 			secret += this.alphabet.charAt(

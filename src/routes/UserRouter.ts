@@ -1,16 +1,16 @@
 import Router from "./Router";
 import { Response, Request } from "express";
-import UserLayer from "../layers/UserLayer";
 import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
 import { ValidationSchema, IValidationSchema } from "@collate/request-validator";
 import GetUserRequestSchema from "../api/GetUserRequest.json";
 import { ILogger } from "@collate/logging";
+import IUserLayer from "../layers/IUserLayer";
 
 export default class UserRouter extends Router {
-	private userLayer : UserLayer;
+	private userLayer : IUserLayer;
 	
-	constructor(userLayer: UserLayer, logger : ILogger) {
+	constructor(userLayer: IUserLayer, logger : ILogger) {
 		super('/user', logger);
 		this.userLayer = userLayer; 
 		this.handleGetUserByID = this.handleGetUserByID.bind(this);

@@ -1,6 +1,5 @@
 import Router from "./Router";
 import { Request, Response } from "express";
-import UserLayer from "../layers/UserLayer";
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
 import StatusCodes from "./StatusCodes";
@@ -8,11 +7,12 @@ import TwitchUser from "../schemas/user/TwitchUser";
 import SubscriptionRequestSchema from '../api/SubscriptionRequest.json';
 import { ValidationSchema } from "@collate/request-validator";
 import { ILogger } from "@collate/logging";
+import IUserLayer from "../layers/IUserLayer";
 
 export default class SubscriptionRouter extends Router {
-    private userLayer : UserLayer;
+    private userLayer : IUserLayer;
 
-    constructor(userLayer: UserLayer, logger : ILogger) {
+    constructor(userLayer: IUserLayer, logger : ILogger) {
         super('/user/subscriptions', logger);
         this.userLayer = userLayer;
 

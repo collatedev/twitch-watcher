@@ -6,6 +6,10 @@ import mockRequest from '../mocks/MockRequest';
 import IRouteHandler from '../../src/routes/IRouteHandler';
 import FakeLogger from "../fakes/FakeLogger";
 import { ILogger } from "@collate/logging";
+import { IValidationSchema, ValidationSchema } from '@collate/request-validator';
+import ChallengeQueryRequestSchema from '../../src/api/WebhookChallengeRequest.json';
+
+const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 
 const logger : ILogger = new FakeLogger();
 
@@ -23,7 +27,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = Router.validate(Router.getChallengeSchema());
+		const middleWare : IRouteHandler = Router.validate(ChallengeSchema);
 		middleWare(request, response, () => {
 			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 			expect(response.json).toHaveBeenCalledWith(

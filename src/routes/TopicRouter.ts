@@ -5,8 +5,9 @@ import StatusCodes from "./StatusCodes";
 import { IValidationSchema, ValidationSchema } from "@collate/request-validator";
 import WebhookChallengeRequestSchema from "../api/WebhookChallengeRequest.json";
 import { ILogger } from "@collate/logging";
+import ITopicRouter from "./ITopicRouter";
 
-export default abstract class TopicRouter extends Router {
+export default abstract class TopicRouter extends Router implements ITopicRouter {
 	private topic : string;
 	private readonly schema : IValidationSchema;
 	private readonly challengeSchema : IValidationSchema;
@@ -42,14 +43,6 @@ export default abstract class TopicRouter extends Router {
 			this.logger.error(error);
 			this.sendError(response, "Failed to process webhook data", StatusCodes.InternalError);
 		}
-	}
-
-	public getSchema() : IValidationSchema {
-		return this.schema;
-	}
-
-	public getChallengeSchema() : IValidationSchema {
-		return this.challengeSchema;
 	}
 
     protected abstract async handleWebhookData(rawBody: any): Promise<void>;

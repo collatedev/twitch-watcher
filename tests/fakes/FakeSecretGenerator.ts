@@ -1,14 +1,13 @@
-import SecretGenerator from "../../src/twitch/SecretGenerator";
+import ISecretGenerator from "../../src/twitch/ISecretGenerator";
 
-export default class FakeSecretGenerator extends SecretGenerator {
+export default class FakeSecretGenerator implements ISecretGenerator {
 	private secret: string;
 
 	constructor(secret: string) {
-		super("");
 		this.secret = secret;
 	}
 
-	public generateSecret(length: number) : string {
+	public generate(length: number) : string {
 		return this.secret;
 	}
 }

@@ -1,12 +1,15 @@
-import UserLayer from "../../src/layers/UserLayer";
 import SubscriptionBody from "../../src/schemas/request/SubscriptionBody";
 import FakeUserModel from "./FakeUserModel";
-import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";
 import TwitchUser from "../../src/schemas/user/TwitchUser";
+import IUserModel from "../../src/models/IUserModel";
+import IUserLayer from "../../src/layers/IUserLayer";
+import UnsubscriptionBody from "../../src/schemas/request/UnsubscriptionBody";
 
-export default class FakeUserLayer extends UserLayer {
+export default class FakeUserLayer implements IUserLayer {
+    private userModel : IUserModel;
+
     constructor(userModel: FakeUserModel) {
-        super(userModel);
+        this.userModel = userModel;
     }
 
     public async getUserInfo(id: number) : Promise<TwitchUser> {
@@ -15,7 +18,11 @@ export default class FakeUserLayer extends UserLayer {
 
     public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
         const userModel : TwitchUser = await this.userModel.getByID(subscriptionBody.userID);
-        userModel.followerHook = new TwitchWebhook("callbackURL", "topic", null);
+        return userModel;
+    }
+
+    public async unsubscribe(unsubscriptionBody: UnsubscriptionBody) : Promise<TwitchUser> {
+        const userModel : TwitchUser = await this.userModel.getByID(unsubscriptionBody.userID);
         return userModel;
     }
 }

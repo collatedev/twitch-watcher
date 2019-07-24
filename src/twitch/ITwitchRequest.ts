@@ -1,5 +1,5 @@
-import TwitchResponse from "./TwitchResponse";
+import ITwitchResponse from "./ITwitchResponse";
 
 export default interface ITwitchRequest {
-	send() : Promise<TwitchResponse>;
+	send() : Promise<ITwitchResponse>;
 }

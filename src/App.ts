@@ -3,8 +3,9 @@ import * as BodyParser from "body-parser";
 import IRouter from "./routes/IRouter";
 import morgan from "morgan";
 import { ILogger } from "@collate/logging";
+import IApp from "./IApp";
 
-export default class App {
+export default class App implements IApp {
     public app: Express.Application;
     private logger : ILogger;
 

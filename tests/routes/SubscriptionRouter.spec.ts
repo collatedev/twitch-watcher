@@ -4,7 +4,6 @@ import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
 import FakeUserLayer from "../fakes/FakeUserLayer";
 import TwitchUser from "../../src/schemas/user/TwitchUser";
-import TwitchWebhook from "../../src/schemas/user/TwitchWebhook";   
 import StatusCodes from "../../src/routes/StatusCodes";
 import mockResponse from '../mocks/mockResponse';
 import mockRequest from '../mocks/mockRequest';
@@ -112,7 +111,6 @@ describe('handleSubscription', () => {
         });
         const response : any = mockResponse();
         const expectedUser : TwitchUser = new TwitchUser(1);
-        expectedUser.followerHook = new TwitchWebhook("callbackURL", "topic", null);
 
         await router.handleSubscription(request, response);
 

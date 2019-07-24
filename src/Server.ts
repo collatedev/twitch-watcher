@@ -9,6 +9,9 @@ import UserFollowedRouter from "./routes/UserFollowedRouter";
 import NewFollowerRouter from "./routes/NewFollowerRouter";
 import TwitchProfileUpdateRouter from "./routes/TwitchProfileUpdateRouter";
 import { ILogger, Logger } from "@collate/logging";
+import TwitchService from "./twitch/TwitchService";
+import HTTPRequestBuilder from "./request_builder/HTTPRequestBuilder";
+import SecretGenerator from "./twitch/SecretGenerator";
 
 const PortIndex : number = 2;
 
@@ -18,7 +21,8 @@ function main() : void {
 	const app : App = new App(logger);
 	app.initialize();
 
-	const userLayer : UserLayer = new UserLayer(new UserModel());
+	const twitchService : TwitchService = new TwitchService(new HTTPRequestBuilder(), new SecretGenerator(), logger);
+	const userLayer : UserLayer = new UserLayer(new UserModel(), twitchService);
 	app.addRouter(new UserRouter(userLayer, logger));
 	app.addRouter(new SubscriptionRouter(userLayer, logger));
 	app.addRouter(new StreamRouter(logger));

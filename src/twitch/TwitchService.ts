@@ -1,24 +1,25 @@
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import SubscribeRequest from './SubscribeRequest';
-import TwitchRequest from './TwitchRequest';
-import TwitchResponse from './TwitchResponse';
 import TwitchSubscription from './TwitchSubscription';
 import HTTPRequestBuilder from '../request_builder/HTTPRequestBuilder';
 import IRequestBuilder from "../request_builder/IRequestBuilder";
 import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
 import TwitchCallbackURL from "./TwitchCallbackURL";
-import { ILogger, Logger } from "@collate/logging";
-import SecretGenerator from "./SecretGenerator";
+import { ILogger } from "@collate/logging";
+import ISecretGenerator from "./ISecretGenerator";
+import ITwitchRequest from "./ITwitchRequest";
+import ITwitchResponse from "./ITwitchResponse";
+import ITwitchService from "./ITwitchService";
 
-type PendingTwitchResponse = Promise<TwitchResponse>;
+type PendingTwitchResponse = Promise<ITwitchResponse>;
 
-export default class Twitch {
+export default class TwitchService implements ITwitchService {
 	private requestBuilder : IRequestBuilder = new HTTPRequestBuilder();
-	private logger : ILogger = new Logger('info', 'twitch.log');
-	private secretGenerator : SecretGenerator;
+	private logger : ILogger;
+	private secretGenerator : ISecretGenerator;
 
-	constructor(requestBuilder : IRequestBuilder, secretGenerator : SecretGenerator, logger : ILogger) {
+	constructor(requestBuilder : IRequestBuilder, secretGenerator : ISecretGenerator, logger : ILogger) {
 		this.requestBuilder = requestBuilder;
 		this.logger = logger;
 		this.secretGenerator = secretGenerator;
@@ -49,21 +50,21 @@ export default class Twitch {
 		return requests;
 	}
 
-	private async makeRequests(requests: TwitchRequest[]) : Promise<void> {
+	private async makeRequests(requests: ITwitchRequest[]) : Promise<void> {
 		const messages : PendingTwitchResponse[] = this.sendRequests(requests);	
-		const responses : TwitchResponse[] = await Promise.all(messages);
+		const responses : ITwitchResponse[] = await Promise.all(messages);
 		this.validateResponses(responses);
 	}
 
-	private validateResponses(responses: TwitchResponse[]) : void {
+	private validateResponses(responses: ITwitchResponse[]) : void {
 		for (const response of responses) {
-			if (response.HTTPResponse.status !== StatusCodes.Accepted) {
-				throw new Error(`Failed to subscribe to ${response.request.body}`);
+			if (response.response().status !== StatusCodes.Accepted) {
+				throw new Error(`Failed to subscribe to ${response.request().body}`);
 			}
 		}
 	}
 
-	private sendRequests(requests: TwitchRequest[]) : PendingTwitchResponse[] {
+	private sendRequests(requests: ITwitchRequest[]) : PendingTwitchResponse[] {
 		const messages : PendingTwitchResponse[] = [];
 		for (const request of requests) {
 			messages.push(request.send());

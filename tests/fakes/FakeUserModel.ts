@@ -1,11 +1,10 @@
-import UserModel from "../../src/models/UserModel";
 import TwitchUser from "../../src/schemas/user/TwitchUser";
+import IUserModel from "../../src/models/IUserModel";
 
-export default class FakeUserModel extends UserModel {
+export default class FakeUserModel implements IUserModel {
     private db : { [key: number]: TwitchUser; };
 
     constructor() {
-        super();
         this.db = {};
     }
 

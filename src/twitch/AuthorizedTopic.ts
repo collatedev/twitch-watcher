@@ -1,10 +1,12 @@
+import IAuthorizedTopic from "./IAuthorizedTopic";
+
 const AuthorizedTopics: { [id: string]: string[] } = {
     "user": ["user:read:email"]
 };
 
 const EmptyScope : string = "";
 
-export default class AuthorizedTopic {
+export default class AuthorizedTopic implements IAuthorizedTopic {
     private topic : string;
 
     constructor(topic : string) {

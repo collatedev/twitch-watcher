@@ -2,19 +2,20 @@ import UserRouter from "../../src/routes/UserRouter";
 import FakeUserModel from "../fakes/FakeUserModel";
 import ErrorMessage from "../../src/messages/ErrorMessage";
 import DataMessage from "../../src/messages/DataMessage";
-import UserLayer from "../../src/layers/UserLayer";
 import StatusCodes from "../../src/routes/StatusCodes";
 import mockResponse from '../mocks/mockResponse';
 import mockRequest from '../mocks/mockRequest';
 import IRouteHandler from "../../src/routes/IRouteHandler";
 import FakeLogger from "../fakes/FakeLogger";
 import { ILogger } from "@collate/logging";
+import FakeUserLayer from "../fakes/FakeUserLayer";
+import IUserLayer from "../../src/layers/IUserLayer";
 
 const logger : ILogger = new FakeLogger();
 
 describe("validate() [middleware]", () => {
 	test('Should fail to validate due to incorrect type', (done : any) => {
-        const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()), logger);
+        const router : UserRouter = new UserRouter(new FakeUserLayer(new FakeUserModel()), logger);
         router.setup();
 		const request : any = mockRequest({
             params: {
@@ -45,7 +46,7 @@ describe("validate() [middleware]", () => {
 
 describe('handleGetUserByID()', () => {
     test('Should fail because user does not exist', async () => {
-        const router : UserRouter = new UserRouter(new UserLayer(new FakeUserModel()), logger);
+        const router : UserRouter = new UserRouter(new FakeUserLayer(new FakeUserModel()), logger);
         router.setup();
         const request : any = mockRequest({
             params: {
@@ -64,7 +65,7 @@ describe('handleGetUserByID()', () => {
 
     test('Should get user data', async () => {
         const twitchModel : FakeUserModel = new FakeUserModel();
-        const userLayer : UserLayer = new UserLayer(twitchModel);
+        const userLayer : IUserLayer = new FakeUserLayer(twitchModel);
         const router : UserRouter = new UserRouter(userLayer, logger);
         router.setup();
         const request : any = mockRequest({

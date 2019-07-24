@@ -1,9 +1,10 @@
 import ITwitchWebhookRequestBody from "./ITwitchWebhookRequestBody";
 import * as Path from "path";
-import TwitchSubscription from "./TwitchSubscription";
-import SecretGenerator from "./SecretGenerator";
 import ITwitchRequestBody from "./ITwitchRequestBody";
 import AuthorizedTopic from "./AuthorizedTopic";
+import ISecretGenerator from "./ISecretGenerator";
+import IAuthorizedTopic from "./IAuthorizedTopic";
+import ITwitchSubscription from "./ITwitchSubscription";
 
 const SecretSize : number = 16;
 const LeaseSeconds : number = 864000; // 10 days in seconds
@@ -15,35 +16,35 @@ export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBo
 	public "hub.lease_seconds": number;
 	public "hub.secret": string;
 
-	private authorizedTopic : AuthorizedTopic;
-	private secretGenerator: SecretGenerator;
+	private authorizedTopic : IAuthorizedTopic;
+	private secretGenerator: ISecretGenerator;
 
-	constructor(subscription: TwitchSubscription, secretGenerator : SecretGenerator) {
-		this.authorizedTopic = new AuthorizedTopic(subscription.topic);
+	constructor(subscription: ITwitchSubscription, secretGenerator : ISecretGenerator) {
+		this.authorizedTopic = new AuthorizedTopic(subscription.topic());
 		this.secretGenerator = secretGenerator;
 		this.setupBodyFields(subscription);
 	}
 
-	private setupBodyFields(subscription: TwitchSubscription) : void {
-		this["hub.mode"] = subscription.mode;
+	private setupBodyFields(subscription: ITwitchSubscription) : void {
+		this["hub.mode"] = subscription.mode();
 		this["hub.lease_seconds"] = LeaseSeconds;
-		this["hub.secret"] = this.secretGenerator.generateSecret(SecretSize);
-		this["hub.callback"] = Path.join(subscription.callbackURL, subscription.topic).replace(':', ':/');
+		this["hub.secret"] = this.secretGenerator.generate(SecretSize);
+		this["hub.callback"] = Path.join(subscription.callbackURL(), subscription.topic()).replace(':', ':/');
 		this["hub.topic"] = this.generateTopicURL(subscription);
 	}
 
-	private generateTopicURL(subscription: TwitchSubscription): string {
-		switch(subscription.topic) {
+	private generateTopicURL(subscription: ITwitchSubscription): string {
+		switch(subscription.topic()) {
 			case "follow/new":
-				return `https://api.twitch.tv/helix/users/follows?first=1&to_id=${subscription.userID}`;
+				return `https://api.twitch.tv/helix/users/follows?first=1&to_id=${subscription.userID()}`;
 			case "follow/followed":
-				return `https://api.twitch.tv/helix/users/follows?first=1&from_id=${subscription.userID}`;
+				return `https://api.twitch.tv/helix/users/follows?first=1&from_id=${subscription.userID()}`;
 			case "user":
-				return `https://api.twitch.tv/helix/users?id=${subscription.userID}`;
+				return `https://api.twitch.tv/helix/users?id=${subscription.userID()}`;
 			case "streams":
-				return `https://api.twitch.tv/helix/streams?user_id=${subscription.userID}`;
+				return `https://api.twitch.tv/helix/streams?user_id=${subscription.userID()}`;
 			default:
-				throw new Error(`Unknown topic: '${subscription.topic}'`);
+				throw new Error(`Unknown topic: '${subscription.topic()}'`);
 		}
 	}
 
