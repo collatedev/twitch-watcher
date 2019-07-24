@@ -3,7 +3,6 @@ import FakeRequesetBuilder from "../fakes/FakeRequestBuilder";
 import SubscriptionBody from '../../src/schemas/request/SubscriptionBody';
 import { Response } from 'node-fetch';
 import StatusCodes from '../../src/routes/StatusCodes';
-import TwitchWebhookRequestBody from "../../src/twitch/TwitchWebhookRequestBody";
 import FakeSecretGenerator from "../fakes/FakeSecretGenerator";
 import FakeLogger from "../fakes/FakeLogger";
 
@@ -27,10 +26,10 @@ describe('subscribe', () => {
 		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
 		queueBearerResponse(requestBuilder);
 		queueAuthorizationResponses(requestBuilder, StatusCodes.Accepted);
-		Twitch.RequestBuilder = requestBuilder;
-		Twitch.Logger = new FakeLogger();
+
+		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
 		
-		await Twitch.subscribe(new SubscriptionBody({
+		await twitch.subscribe(new SubscriptionBody({
 			callbackURL: "",
 			userID: 123
 		}));
@@ -41,14 +40,14 @@ describe('subscribe', () => {
 		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
 		queueBearerResponse(requestBuilder);
 		queueAuthorizationResponses(requestBuilder, StatusCodes.BadRequest);
-		Twitch.RequestBuilder = requestBuilder;
-		Twitch.Logger = new FakeLogger();
-		TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
+		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("secret"), new FakeLogger());
 
-		await expect(Twitch.subscribe(new SubscriptionBody({
-			callbackURL: "",
-			userID: 123
-		}))).rejects.toEqual(new Error(
+		await expect(twitch.subscribe(
+			new SubscriptionBody({
+				callbackURL: "",
+				userID: 123
+			})
+		)).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
 			`helix/users/follows?first=1&to_id=123","hub.secret":"secret","hub.callba` +
 			`ck":"endpoint_url/follow/new","hub.lease_seconds":864000}`
@@ -59,13 +58,14 @@ describe('subscribe', () => {
 		process.env.NODE_ENV = "test";
 		const requestBuilder : FakeRequesetBuilder = new FakeRequesetBuilder();
 		queueBearerResponse(requestBuilder);
-		Twitch.RequestBuilder = requestBuilder;
-		Twitch.Logger = new FakeLogger();
+		const twitch : Twitch = new Twitch(requestBuilder, new FakeSecretGenerator("foo"), new FakeLogger());
 
-		await expect(Twitch.subscribe(new SubscriptionBody({
-			callbackURL: "",
-			userID: 123
-		}))).rejects.toEqual(new Error("Request Failed"));
+		await expect(twitch.subscribe(
+			new SubscriptionBody({
+				callbackURL: "",
+				userID: 123
+			})
+		)).rejects.toEqual(new Error("Request Failed"));
 	});
 });
 

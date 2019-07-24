@@ -1,4 +1,5 @@
 import App from "./App";
+import * as Dotenv from "dotenv";
 import UserRouter from "./routes/UserRouter";
 import UserModel from "./models/UserModel";
 import SubscriptionRouter from "./routes/SubscriptionRouter";
@@ -12,6 +13,7 @@ import { ILogger, Logger } from "@collate/logging";
 const PortIndex : number = 2;
 
 function main() : void {
+	Dotenv.config();
 	const logger : ILogger = getLogger();
 	const app : App = new App(logger);
 	app.initialize();

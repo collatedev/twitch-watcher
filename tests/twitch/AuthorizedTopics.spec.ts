@@ -2,20 +2,28 @@ import AuthorizedTopic from '../../src/twitch/AuthorizedTopic';
 
 describe('isAuthorizedTopic', () => {
     test('is an authorized topic', () => {
-        expect(AuthorizedTopic.isAuthorizedTopic("user")).toEqual(true);
+        const topic : AuthorizedTopic = new AuthorizedTopic("user");
+
+        expect(topic.isAuthorized()).toBeTruthy();
     });
 
     test('is not an authorized topic', () => {
-        expect(AuthorizedTopic.isAuthorizedTopic("foo")).toEqual(false);
+        const topic : AuthorizedTopic = new AuthorizedTopic("foo");
+
+        expect(topic.isAuthorized()).toBeFalsy();
     });
 });
 
 describe('scope', () => {
     test('unauthorized topic has no scope', () => {
-        expect(AuthorizedTopic.scope("foo")).toEqual("");
+        const topic : AuthorizedTopic = new AuthorizedTopic("foo");
+
+        expect(topic.scope()).toEqual("");
     });
 
     test('authorized topic has a scope', () => {
-        expect(AuthorizedTopic.scope("user")).toEqual("user:read:email");
+        const topic : AuthorizedTopic = new AuthorizedTopic("user");
+
+        expect(topic.scope()).toEqual("user:read:email");
     });
 });

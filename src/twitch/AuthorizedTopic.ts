@@ -1,18 +1,25 @@
-export default class AuthorizedTopic {
-    private static readonly EmptyScope : string = "";
-    private static readonly AuthorizedTopics: { [id: string]: string[] } = {
-		"user": ["user:read:email"]
-	};
+const AuthorizedTopics: { [id: string]: string[] } = {
+    "user": ["user:read:email"]
+};
 
-    public static isAuthorizedTopic(topic : string) : boolean {
-        return this.AuthorizedTopics.hasOwnProperty(topic);
+const EmptyScope : string = "";
+
+export default class AuthorizedTopic {
+    private topic : string;
+
+    constructor(topic : string) {
+        this.topic = topic;
     }
 
-    public static scope(topic: string) : string {
-        if (!this.isAuthorizedTopic(topic)) {
-            return this.EmptyScope;
+    public isAuthorized() : boolean {
+        return AuthorizedTopics.hasOwnProperty(this.topic);
+    }
+
+    public scope() : string {
+        if (!this.isAuthorized()) {
+            return EmptyScope;
         } else {
-            return this.AuthorizedTopics[topic].join(" ").trim();
+            return AuthorizedTopics[this.topic].join(" ").trim();
         }
     }
 }

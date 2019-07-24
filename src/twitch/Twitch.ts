@@ -1,5 +1,4 @@
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
-import * as Dotenv from 'dotenv';
 import SubscribeRequest from './SubscribeRequest';
 import TwitchRequest from './TwitchRequest';
 import TwitchResponse from './TwitchResponse';
@@ -10,23 +9,27 @@ import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
 import TwitchCallbackURL from "./TwitchCallbackURL";
 import { ILogger, Logger } from "@collate/logging";
+import SecretGenerator from "./SecretGenerator";
 
-Dotenv.config();
-
-// Created short hand type due to length and nesting of 
-// Array<Promise<TwitchResponse>>
 type PendingTwitchResponse = Promise<TwitchResponse>;
 
 export default class Twitch {
-	public static RequestBuilder : IRequestBuilder = new HTTPRequestBuilder();
-	public static Logger : ILogger = new Logger('info', 'twitch.log');
+	private requestBuilder : IRequestBuilder = new HTTPRequestBuilder();
+	private logger : ILogger = new Logger('info', 'twitch.log');
+	private secretGenerator : SecretGenerator;
 
-	public static async subscribe(body: SubscriptionBody) : Promise<void> {
+	constructor(requestBuilder : IRequestBuilder, secretGenerator : SecretGenerator, logger : ILogger) {
+		this.requestBuilder = requestBuilder;
+		this.logger = logger;
+		this.secretGenerator = secretGenerator;
+	}
+
+	public async subscribe(body: SubscriptionBody) : Promise<void> {
 		try {
 			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
 			const requests : SubscribeRequest[] = this.getRequests(body, callbackURL);
 			await this.makeRequests(requests);
-			this.Logger.info(
+			this.logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${body.userID}) to all webhooks`
 			);	
 		} catch (error) {
@@ -34,24 +37,25 @@ export default class Twitch {
 		}
 	}
 
-	private static getRequests(body: SubscriptionBody, callbackURL: string) : SubscribeRequest[] {
+	private getRequests(body: SubscriptionBody, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new SubscribeRequest(
 				new TwitchSubscription(body, topic, callbackURL), 
-				this.RequestBuilder
+				this.requestBuilder,
+				this.secretGenerator
 			));
 		}
 		return requests;
 	}
 
-	private static async makeRequests(requests: TwitchRequest[]) : Promise<void> {
+	private async makeRequests(requests: TwitchRequest[]) : Promise<void> {
 		const messages : PendingTwitchResponse[] = this.sendRequests(requests);	
 		const responses : TwitchResponse[] = await Promise.all(messages);
 		this.validateResponses(responses);
 	}
 
-	private static validateResponses(responses: TwitchResponse[]) : void {
+	private validateResponses(responses: TwitchResponse[]) : void {
 		for (const response of responses) {
 			if (response.HTTPResponse.status !== StatusCodes.Accepted) {
 				throw new Error(`Failed to subscribe to ${response.request.body}`);
@@ -59,7 +63,7 @@ export default class Twitch {
 		}
 	}
 
-	private static sendRequests(requests: TwitchRequest[]) : PendingTwitchResponse[] {
+	private sendRequests(requests: TwitchRequest[]) : PendingTwitchResponse[] {
 		const messages : PendingTwitchResponse[] = [];
 		for (const request of requests) {
 			messages.push(request.send());

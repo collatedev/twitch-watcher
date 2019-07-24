@@ -45,7 +45,6 @@ describe('send()', () => {
 			callbackURL: "",
 			userID: 1
 		});
-		TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 		const subscription : TwitchSubscription = new TwitchSubscription(body, "user", "foo");
 		const builder : FakeRequestBuilder = new FakeRequestBuilder();
@@ -63,7 +62,7 @@ describe('send()', () => {
 				"Content-Type": "application/json",
 				"Authorization": 'Bearer asdfasdf'
 			}),
-			body: new TwitchWebhookRequestBody(subscription).getBody(),
+			body: new TwitchWebhookRequestBody(subscription, new FakeSecretGenerator("secret")).getBody(),
 			method: "POST"
 		}, new Response("", {
 			status: 202
@@ -78,7 +77,6 @@ describe('send()', () => {
 		const subscription : TwitchSubscription = new TwitchSubscription(body, "streams", "foo");
 		const builder : FakeRequestBuilder = new FakeRequestBuilder();
 		const request : TestTwitchRequest = new TestTwitchRequest(subscription, builder);
-		TwitchWebhookRequestBody.SecretGenerator = new FakeSecretGenerator("secret");
 
 		builder.queueResponse(new Response("", {
 			status: 202
@@ -90,7 +88,7 @@ describe('send()', () => {
 				"Client-ID": clientID === undefined ? "" : clientID,
 				"Content-Type": "application/json",
 			}),
-			body: new TwitchWebhookRequestBody(subscription).getBody(),
+			body: new TwitchWebhookRequestBody(subscription, new FakeSecretGenerator("secret")).getBody(),
 			method: "POST"
 		}, new Response("", {
 			status: 202

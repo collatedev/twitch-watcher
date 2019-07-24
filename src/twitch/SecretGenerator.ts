@@ -1,10 +1,14 @@
-export default class SecretGenerator {
-	public static DefaultAlphabet: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
+const DefaultAlphabet: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()";
 
+export default class SecretGenerator {
 	private alphabet: string;
 
-	constructor(alphabet: string) {
-		this.alphabet = alphabet;
+	constructor(alphabet? : string) {
+		if (alphabet === undefined) {
+			this.alphabet = DefaultAlphabet;
+		} else {
+			this.alphabet = alphabet;
+		}
 	}
 
 	public generateSecret(length: number) : string {
