@@ -1,5 +1,5 @@
 {
-  "name": "twitchwatcher",
+  "name": "@collate/twitchwatcher",
   "version": "1.0.0",
   "description": "A service that watches twitch webhooks of influencers on Collate",
   "main": "./lib/index.js",
@@ -76,5 +76,9 @@
       "html"
     ],
     "all": true
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
   }
 }
