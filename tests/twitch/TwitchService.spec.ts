@@ -2,9 +2,9 @@ import TwitchService from "../../src/twitch/TwitchService";
 import FakeRequesetBuilder from "../fakes/FakeRequestBuilder";
 import SubscriptionBody from '../../src/schemas/request/SubscriptionBody';
 import { Response } from 'node-fetch';
-import StatusCodes from '../../src/routes/StatusCodes';
 import FakeSecretGenerator from "../fakes/FakeSecretGenerator";
 import FakeLogger from "../fakes/FakeLogger";
+import { StatusCodes } from "@collate/router";
 
 const WebhookCount : number = 4;
 

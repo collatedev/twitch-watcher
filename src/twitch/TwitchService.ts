@@ -3,7 +3,6 @@ import SubscribeRequest from './SubscribeRequest';
 import TwitchSubscription from './TwitchSubscription';
 import HTTPRequestBuilder from '../request_builder/HTTPRequestBuilder';
 import IRequestBuilder from "../request_builder/IRequestBuilder";
-import StatusCodes from "../routes/StatusCodes";
 import TwitchTopics from "./TwitchTopics";
 import TwitchCallbackURL from "./TwitchCallbackURL";
 import { ILogger } from "@collate/logging";
@@ -11,6 +10,7 @@ import ISecretGenerator from "./ISecretGenerator";
 import ITwitchRequest from "./ITwitchRequest";
 import ITwitchResponse from "./ITwitchResponse";
 import ITwitchService from "./ITwitchService";
+import { StatusCodes } from "@collate/router";
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 

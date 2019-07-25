@@ -1,11 +1,10 @@
-import Router from "./Router";
 import { Response, Request } from "express";
-import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
 import { ValidationSchema, IValidationSchema } from "@collate/request-validator";
 import GetUserRequestSchema from "../api/GetUserRequest.json";
 import { ILogger } from "@collate/logging";
 import IUserLayer from "../layers/IUserLayer";
+import { Router, StatusCodes } from "@collate/router";
 
 export default class UserRouter extends Router {
 	private userLayer : IUserLayer;

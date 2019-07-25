@@ -1,10 +1,7 @@
-import Message from "./Message";
+import { Message } from "@collate/router";
 
 export default class DataMessage extends Message {
-	public readonly data : object;
-
 	constructor(data: object) {
-		super(true);
-		this.data = data;
+		super(true, data);
 	}
 }

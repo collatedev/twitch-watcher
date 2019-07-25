@@ -17,11 +17,11 @@
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        
     },
     "include": [
         "src/**/*",
-        "**/*.spec.ts"
+        "**/*.spec.ts",
+        "src/api/*.json"
     ],
     "exclude": [
         "node_modules",

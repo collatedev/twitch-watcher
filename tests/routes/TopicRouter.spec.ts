@@ -1,11 +1,10 @@
 import ErrorMessage from "../../src/messages/ErrorMessage";
 import TestTopicRouter from "../fakes/TestTopicRouter";
 import DataMessage from '../../src/messages/DataMessage';
-import StatusCodes from '../../src/routes/StatusCodes';
 import TestBody from "../fakes/TestBody";
 import mockResponse from '../mocks/MockResponse';
 import mockRequest from '../mocks/MockRequest';
-import IRouteHandler from "../../src/routes/IRouteHandler";
+import { StatusCodes, IRouteHandler } from "@collate/router";
 import ChallengeQueryRequestSchema from '../../src/api/WebhookChallengeRequest.json';
 import TopicTestRequestSchema from '../api/TestTopic.json';
 import { ValidationSchema, IValidationSchema } from "@collate/request-validator";

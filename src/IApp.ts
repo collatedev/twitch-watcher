@@ -1,4 +1,4 @@
-import IRouter from "./routes/IRouter";
+import { IRouter } from "@collate/router";
 
 export default interface IApp {
     initialize() : void;

@@ -1,9 +1,8 @@
 import NewFollowerRouter from '../../src/routes/NewFollowerRouter';
 import ErrorMessage from '../../src/messages/ErrorMessage';
-import StatusCodes from '../../src/routes/StatusCodes';
 import mockResponse from '../mocks/MockResponse';
 import mockRequest from '../mocks/MockRequest';
-import IRouteHandler from '../../src/routes/IRouteHandler';
+import { StatusCodes, IRouteHandler } from "@collate/router";
 import FakeLogger from "../fakes/FakeLogger";
 import { ILogger } from "@collate/logging";
 import ChallengeQueryRequestSchema from '../../src/api/WebhookChallengeRequest.json';

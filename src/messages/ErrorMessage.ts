@@ -1,10 +1,10 @@
-import Message from "./Message";
+import { Message } from "@collate/router";
 
 export default class ErrorMessage extends Message {
-	public readonly errors : any;
+	public readonly error : any;
 
-	constructor(errors : any) {
-		super(false);
-		this.errors = errors;
+	constructor(error : any) {
+		super(false, null);
+		this.error = error;
 	}
 }

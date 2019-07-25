@@ -1,13 +1,12 @@
-import Router from "./Router";
 import { Request, Response } from "express";
 import SubscriptionBody from "../schemas/request/SubscriptionBody";
 import UnsubscriptionBody from "../schemas/request/UnsubscriptionBody";
-import StatusCodes from "./StatusCodes";
 import TwitchUser from "../schemas/user/TwitchUser";
 import SubscriptionRequestSchema from '../api/SubscriptionRequest.json';
 import { ValidationSchema } from "@collate/request-validator";
 import { ILogger } from "@collate/logging";
 import IUserLayer from "../layers/IUserLayer";
+import { Router, StatusCodes } from "@collate/router";
 
 export default class SubscriptionRouter extends Router {
     private userLayer : IUserLayer;

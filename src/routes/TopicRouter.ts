@@ -1,7 +1,6 @@
-import Router from "./Router";
+import { Router, StatusCodes } from "@collate/router";
 import { Request, Response } from "express";
 import ChallengeQuery from "../schemas/request/ChallengeQuery";
-import StatusCodes from "./StatusCodes";
 import { IValidationSchema, ValidationSchema } from "@collate/request-validator";
 import WebhookChallengeRequestSchema from "../api/WebhookChallengeRequest.json";
 import { ILogger } from "@collate/logging";
