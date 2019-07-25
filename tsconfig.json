@@ -5,7 +5,7 @@
         "pretty": true,
         "sourceMap": true,
         "target": "es6",
-        "outDir": "./dist",
+        "outDir": "./lib",
         "noImplicitAny": true,
         "strictFunctionTypes": true,
         "noImplicitThis": true,
@@ -17,6 +17,7 @@
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "declaration": true
     },
     "include": [
         "src/**/*",

@@ -17,6 +17,7 @@
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "declaration": true
     },
     "include": [
         "src/**/*",
